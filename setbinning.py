@@ -204,8 +204,8 @@ def getnoisedis(directories, path, deconvOffset=False, offset=False):
             y, x = np.indices(noise.shape)
             savedata = np.array([y.ravel()[zeroidx], x.ravel()[zeroidx], data.ravel()[zeroidx]*scaling, noise.ravel()[zeroidx]*scaling]).T
 
-            # with open(fdir+'/vorbin_input.txt', 'w+') as datafile_id:
-            #     np.savetxt(datafile_id, savedata, fmt=['%f','%f', '%f','%f'])
+            with open(fdir+'/vorbin_input.txt', 'w+') as datafile_id:
+                np.savetxt(datafile_id, savedata, fmt=['%f','%f', '%f','%f'])
 
 def create_cat(directories, path, constrain=False, bin_data=True):
     from vorbin.voronoi_2d_binning import voronoi_2d_binning
