@@ -30,7 +30,7 @@ def wscat(catdir, catname, path, tile, savedir=False):
     objdec = allobjs[:,3]
 
     # load sfg catalogs
-    table = ascii.read('{}.dat'.format(catname)) #cosmos_sfgcat_extended_update
+    table = ascii.read('{}.dat'.format(catdir+catname)) #cosmos_sfgcat_extended_update
     try:
         catalogs = np.array([table['z'], table['id'], table['x'], table['y'], table['ra'], table['dec']]).T
     except KeyError:
