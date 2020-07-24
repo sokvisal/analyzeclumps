@@ -59,7 +59,8 @@ def return_offsets(catdir, catname, tile, path):
         return snrcat[id_idx, fluxes[idx]]
 
 
-    for _dir in tqdm(glob.glob('./{}/a{}/_id*'.format(path, tile))[:]):
+    for _dir in glob.glob('./{}/a{}/_id*'.format(path, tile))[:]:
+        print (_dir)
         _id = int(os.path.basename(_dir).split('-')[1].split('_')[0])
         filename = os.path.basename(_dir)
         # print (_dir)
@@ -77,7 +78,9 @@ def return_offsets(catdir, catname, tile, path):
 
         skipdata = False
         for j, band in enumerate(bands[::-1]):
-            img = fits.open('../images/{}/{}-{}.fits'.format(tile, tile, band))[0].data
+            hdu = fits.open('../images/{}/{}-{}.fits'.format(tile, tile, band))
+            img = hdu[0].data
+            hdu.close()
             tmpimg = img[int(y-26):int(y+26), int(x-26):int(x+26)]
             if np.isnan(tmpimg).any():
                 # plt.imshow(tmpimg)
@@ -128,13 +131,11 @@ def return_offsets(catdir, catname, tile, path):
 
         if skipdata:
             shutil.move(_dir, _dir.replace(filename, 'badphot/{}'.format(filename)))
-            print (_dir)
         else:
             offsetcoords = np.array(offsetcoords)
             offsetTab = Table([offsetcoords[:,i] for i in range(2)], names=('dy', 'dx'), meta={'name': 'offsef in pixels'})
             ascii.write(offsetTab, './{}/a{}/offsets/_id-{}.dat'.format(path, tile, int(_id)),\
                         overwrite=True, format='commented_header')
-        print (' \n ')
 
 
     #     oldb = oldlist[9]

@@ -30,7 +30,7 @@ def wscat(catdir, catname, path, tile, savedir=False):
     objdec = allobjs[:,3]
 
     # load sfg catalogs
-    table = ascii.read('{}.dat'.format(catdir+catname)) #cosmos_sfgcat_extended_update
+    table = ascii.read(catdir+catname) #cosmos_sfgcat_extended_update
     try:
         catalogs = np.array([table['z'], table['id'], table['x'], table['y'], table['ra'], table['dec']]).T
     except KeyError:
@@ -73,7 +73,6 @@ def wscat(catdir, catname, path, tile, savedir=False):
     catalogs[:,3] = caty
 
     catalogs = catalogs[:]
-    print (catalogs.shape)
     for (_id,x,y) in zip(catalogs[:,1], catalogs[:,2], catalogs[:,3]):
 
         size = 26
@@ -115,7 +114,7 @@ def wscat(catdir, catname, path, tile, savedir=False):
 
         ell = fit.plotEllipse(a, b, phi)
 
-        # print (tmpsig,a,b,phi)
+        print (_id, a, b, phi)
         # nrow = 1
         # ncol = 4
         # imscale = 2.5
