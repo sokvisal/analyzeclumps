@@ -88,7 +88,7 @@ def wscat(catname, path, tile, savedir=False):
     #     matchimg = fits.open('{}/subaru-zp_lambd-000100.0/g_1.fits'.format(tmpdir))[0].data
     #     matchimg = rescale(matchimg, 156./52., mode='reflect', multichannel=False)*(52./156.)**2
 
-        tmpsig = 4.
+        tmpsig = 3.5
         while True:
             masked = matchimg.copy()
             filtered = sigma_clip(matchimg, sigma=tmpsig, masked=True)
@@ -294,29 +294,29 @@ def ws_2maps(catname, path, tile, savedir=False):
         ell = fit.plotEllipse(a, b, phi)
 
         # if _id == 114072:
-        print (_id,tmpsig,a,b,phi)
-        nrow = 1
-        ncol = 4
-        imscale = 2.5
-        fig = plt.figure(figsize=((ncol+1)*imscale, (nrow+1)*imscale))
-        gs = gridspec.GridSpec(nrow, ncol, wspace=0.0, hspace=0.0, top=1.-0.5/(nrow+1),\
-                           bottom=0.5/(nrow+1), left=0.5/(ncol+1), right=1-0.5/(ncol+1))
-
-        ax = plt.subplot(gs[0])
-        ax.imshow(matchimg, origin='lower')
-
-        ax = plt.subplot(gs[1])
-        ax.imshow(masked, origin='lower')
-        ax.scatter(tmpobjs[:,1],tmpobjs[:,0], marker='x', color='r')
-
-        ax = plt.subplot(gs[2])
-        ax.imshow(segmap, cmap=plt.cm.nipy_spectral, origin='lower')
-        ax.scatter(tmpobjs[:,1],tmpobjs[:,0], marker='x', color='r')
-
-        ax = plt.subplot(gs[3])
-        ax.imshow(edges, origin='lower')
-        ax.scatter(tmpx+ell[0,:], tmpy+ell[1,:], color='g', s=2)
-        plt.show()
+        # print (_id,tmpsig,a,b,phi)
+        # nrow = 1
+        # ncol = 4
+        # imscale = 2.5
+        # fig = plt.figure(figsize=((ncol+1)*imscale, (nrow+1)*imscale))
+        # gs = gridspec.GridSpec(nrow, ncol, wspace=0.0, hspace=0.0, top=1.-0.5/(nrow+1),\
+        #                    bottom=0.5/(nrow+1), left=0.5/(ncol+1), right=1-0.5/(ncol+1))
+        #
+        # ax = plt.subplot(gs[0])
+        # ax.imshow(matchimg, origin='lower')
+        #
+        # ax = plt.subplot(gs[1])
+        # ax.imshow(masked, origin='lower')
+        # ax.scatter(tmpobjs[:,1],tmpobjs[:,0], marker='x', color='r')
+        #
+        # ax = plt.subplot(gs[2])
+        # ax.imshow(segmap, cmap=plt.cm.nipy_spectral, origin='lower')
+        # ax.scatter(tmpobjs[:,1],tmpobjs[:,0], marker='x', color='r')
+        #
+        # ax = plt.subplot(gs[3])
+        # ax.imshow(edges, origin='lower')
+        # ax.scatter(tmpx+ell[0,:], tmpy+ell[1,:], color='g', s=2)
+        # plt.show()
 
         if savedir:
             if not os.path.isdir('./{}/a{}/watershed_segmaps'.format(path, tile)):

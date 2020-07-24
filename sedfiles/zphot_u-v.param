@@ -7,7 +7,7 @@ SMOOTH_FILTERS       n                  # Smooth filter curves with Gaussian
 SMOOTH_SIGMA         100.               # Gaussian sigma (in Angstroms) to smooth filters
 
 ## Templates
-TEMPLATES_FILE      templates/eazy_v1.3.spectra.param # Template definition file
+TEMPLATES_FILE       templates/eazy_v1.3.spectra.param # Template definition file
 TEMPLATE_COMBOS      a                  # Template combination options:
                                         #         1 : one template at a time
                                         #         2 : two templates, read allowed combinations from TEMPLATES_FILE
@@ -36,7 +36,7 @@ N_MIN_COLORS         12                  # Require N_MIN_COLORS to fit
 ## Output Files
 OUTPUT_DIRECTORY     OUTPUT             # Directory to put output files in
 MAIN_OUTPUT_FILE     cosmos             # Main output file, .zout
-PRINT_ERRORS         y                  # Print 68, 95 and 99% confidence intervals
+PRINT_ERRORS         n                  # Print 68, 95 and 99% confidence intervals
 CHI2_SCALE           1.0                # Scale ML Chi-squared values to improve confidence intervals
 VERBOSE_LOG          y                  # Dump information from the run into [MAIN_OUTPUT_FILE].param
 OBS_SED_FILE         n                  # Write out observed SED/object, .obs_sed
@@ -52,8 +52,8 @@ PRIOR_ABZP           25.               # AB zeropoint of fluxes in catalog.  Nee
 
 ## Redshift Grid
 FIX_ZSPEC            n                  # Fix redshift to catalog zspec
-Z_MIN                0.5                # Minimum redshift
-Z_MAX                1.5                # Maximum redshift
+Z_MIN                0.3                # Minimum redshift
+Z_MAX                2.3                # Maximum redshift
 Z_STEP               0.01               # Redshift step size
 Z_STEP_TYPE          1                  #  0 = ZSTEP, 1 = Z_STEP*(1+z)
 

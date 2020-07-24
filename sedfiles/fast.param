@@ -208,7 +208,7 @@ OUTPUT_FILE    = ''
 N_SIM          = 0
 C_INTERVAL     = 68			# 68 / 95 / 99 or [68,95] etc
 BEST_FIT       = 1			# 0 / 1
-REST_MAG       = [140,142,219] # [140,142,161] for UVJ colors
+REST_MAG       = [153,155,219] # [140,142,161] for UVJ colors
 
 
 #--- CHOOSE STELLAR POPULATIONS LIBRARY --------------------------------
@@ -272,6 +272,7 @@ DUST_LAW       = 'calzetti'			# 'calzetti' / 'mw' / 'kc' / 'noll'
 # E_B 	       = 1			# only define for 'noll' dust law
 # delta        = -0.2			# only define for 'noll' dust law
 MY_SFH         = ''
+NO_CACHE       = 1
 
 
 #--- DEFINE GRID -------------------------------------------------------
@@ -305,8 +306,8 @@ LOG_AGE_MIN    = 7.			# log [yr]
 LOG_AGE_MAX    = 10.	 		# log [yr]
 LOG_AGE_STEP   = 0.1			# log [yr]
 NO_MAX_AGE     = 0			# 0 / 1
-Z_MIN          = 0.3 			# Cannot be 0.
-Z_MAX          = 2.3
+Z_MIN          = 0.01 			# Cannot be 0.
+Z_MAX          = 3.00
 Z_STEP         = 0.01
 Z_STEP_TYPE    = 1			# 0: Z_STEP, 1: Z_STEP*(1+z)
 A_V_MIN        = 0.			# [mag]
