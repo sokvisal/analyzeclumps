@@ -5,6 +5,7 @@ from tqdm import tqdm
 import numpy as np
 import copy
 
+
 def _return_photometry(directory, z):
 
     filtsets = ['subaru-rp', 'subaru-zp', 'ultravista-Y', 'ultravista-J', 'ultravista-H']
@@ -31,6 +32,9 @@ def _return_photometry(directory, z):
     return y, x, signal, noise #, svrest
 
 def getnoise(directories, path, imgfact=False):
+    from astropy.stats import sigma_clip
+    from skimage.transform import rescale
+
     import scipy.stats.mstats, scipy.optimize
     import random
     import matplotlib.pyplot as plt
@@ -50,10 +54,15 @@ def getnoise(directories, path, imgfact=False):
                 scaling = scalings[1]
 
             gal, galh = diagnostics.openFits(fdir+'/g_1.fits')
+            gal = rescale(gal, 156./52., mode='reflect', multichannel=False)*(52./156.)**2
+            segmap = sigma_clip(gal, sigma=3., masked=True).mask
+            segmap = np.invert(segmap).astype(float)
+            segmap[segmap==0] = np.nan
+            segmap = segmap[10:-10, 10:-10]
 
-            sexseg = misc._get_segmap(gal, fdir)[10:-10, 10:-10]
-            segmap = np.zeros(sexseg.shape)
-            segmap[sexseg==1] = np.nan
+            # sexseg = misc._get_segmap(gal, fdir)[10:-10, 10:-10]
+            # segmap = np.zeros(sexseg.shape)
+            # segmap[sexseg==1] = np.nan
 
             dec, dech = diagnostics.openFits(fdir+'/deconv_01.fits')
             if imgfact:
@@ -112,8 +121,8 @@ def getnoise(directories, path, imgfact=False):
         # plt.plot(h[1][:h[0].shape[0]], errfun(p), label='error')
         # plt.show()
 
-    # print (np.array(sig))
-    # print (filternames)
+    print (np.array(sig))
+    print (filternames)
 
     tile = directories.split('/')[1]
     np.savetxt('./{}/{}/noise.txt'.format(path, tile), sig, header = ' '.join([str(elem) for elem in filternames]) )
