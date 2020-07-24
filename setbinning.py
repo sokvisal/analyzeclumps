@@ -86,7 +86,7 @@ def getnoise(directories, path, imgfact=False):
         return noise
 
     tmpdirs = [fdir for _dirs in glob.glob('./{}/'.format(path)+directories) for fdir in sorted(glob.glob(_dirs+'/*-*'))][:]
-    tmpdirs = np.array(tmpdirs).reshape(len(tmpdirs)/14, 14).T
+    tmpdirs = np.array(tmpdirs).reshape(int(len(tmpdirs)/14), 14).T
 
     filternames = []
     sig = []
