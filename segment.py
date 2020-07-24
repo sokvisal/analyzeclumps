@@ -47,7 +47,7 @@ def wscat(catdir, catname, path, tile, savedir=False):
     _ids = list(catalogs[:,1])
 
     # load tile image
-    hdu = fits.open(catdir+'cosmos/images/{}/{}-ultravista_Ks.fits'.format(tile, tile))
+    hdu = fits.open(catdir+'/images/{}/{}-ultravista_Ks.fits'.format(tile, tile))
     imgks = hdu[0].data
     header = hdu[0].header
     wcs = pywcs.WCS(header)
