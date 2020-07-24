@@ -5,6 +5,9 @@ import astropy.wcs as pywcs
 from astropy.stats import sigma_clip
 import glob
 
+import astropy
+print (astropy.__version__)
+
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
