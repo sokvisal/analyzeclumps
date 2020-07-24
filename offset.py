@@ -43,6 +43,7 @@ def return_offsets(catdir, catname, tile, path):
     hdu = fits.open('../images/{}/{}-ultravista_Ks.fits'.format(tile, tile))
     imgks = hdu[0].data
     header = hdu[0].header
+    hdu.close()
     wcs = pywcs.WCS(header)
 
     xpos, ypos = wcs.all_world2pix(ra, dec, 1, ra_dec_order=True)
@@ -133,7 +134,7 @@ def return_offsets(catdir, catname, tile, path):
             offsetTab = Table([offsetcoords[:,i] for i in range(2)], names=('dy', 'dx'), meta={'name': 'offsef in pixels'})
             ascii.write(offsetTab, './{}/a{}/offsets/_id-{}.dat'.format(path, tile, int(_id)),\
                         overwrite=True, format='commented_header')
-
+        print (' \n ')
 
 
     #     oldb = oldlist[9]

@@ -49,6 +49,7 @@ def wscat(catdir, catname, path, tile, savedir=False):
     hdu = fits.open(catdir+'/images/{}/{}-ultravista_Ks.fits'.format(tile, tile))
     imgks = hdu[0].data
     header = hdu[0].header
+    hdu.close()
     wcs = pywcs.WCS(header)
 
     # check extend of tile image
