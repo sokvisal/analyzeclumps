@@ -4,6 +4,7 @@ from astropy.io import ascii
 import astropy.wcs as pywcs
 from astropy.stats import sigma_clip
 import glob
+import shutil
 
 import astropy
 
