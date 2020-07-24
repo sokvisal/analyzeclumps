@@ -24,9 +24,9 @@ from skimage.feature import peak_local_max
 
 from numpy.linalg import eig, inv
 
-def wscat(catname, path, tile, savedir=False):
+def wscat(catdir, catname, path, tile, savedir=False):
     # load full catalog
-    allobjs = np.loadtxt('/mnt/drivea/run/cosmos_catalogs/cosmos_full_cat.dat', skiprows=1) #cosmos_full_cat
+    allobjs = np.loadtxt(catdir+'/cosmos_full_cat.dat', skiprows=1) #cosmos_full_cat
     objra = allobjs[:,2]
     objdec = allobjs[:,3]
 
@@ -47,7 +47,7 @@ def wscat(catname, path, tile, savedir=False):
     _ids = list(catalogs[:,1])
 
     # load tile image
-    hdu = fits.open('/mnt/drivea/run/images/{}/{}-ultravista_Ks.fits'.format(tile, tile))
+    hdu = fits.open(catdir+'cosmos/images/{}/{}-ultravista_Ks.fits'.format(tile, tile))
     imgks = hdu[0].data
     header = hdu[0].header
     wcs = pywcs.WCS(header)

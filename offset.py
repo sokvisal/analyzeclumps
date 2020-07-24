@@ -27,12 +27,12 @@ def create_rgb(b, g, r, scalemin, scale='linear'):
 
     return img
 
-catname = 'cosmos_sfgs.dat' #cosmos_close40
-path = './deconv'
+# catname = 'cosmos_sfgs.dat' #cosmos_close40
+# path = './deconv'
 
-def return_offsets(tile):
+def return_offsets(catdir, catname, tile, path):
 
-    table = ascii.read('/mnt/drivea/run/cosmos_catalogs/{}'.format(catname)) #cosmos_sfgcat_extended_update
+    table = ascii.read(catdir+catname) #cosmos_sfgcat_extended_update
     catalogs = np.array([table['z'], table['id'], table['x'], table['y'], table['ra'], table['dec']]).T
     ra = catalogs[:,4]
     dec = catalogs[:,5]
@@ -47,9 +47,8 @@ def return_offsets(tile):
 
     xpos, ypos = wcs.all_world2pix(ra, dec, 1, ra_dec_order=True)
 
-    tmpcat = np.loadtxt('/mnt/drivea/run/cosmos_catalogs/{}'.format(catname),\
-                        skiprows=1, usecols=[i for i in np.arange(11,43)])
-    _ids = np.loadtxt('/mnt/drivea/run/cosmos_catalogs/{}'.format(catname), skiprows=1, usecols=[0])
+    tmpcat = np.loadtxt(catdir+catname, skiprows=1, usecols=[i for i in np.arange(11,43)])
+    _ids = np.loadtxt(catdir+catname, skiprows=1, usecols=[0])
     _ids = list(_ids)
     snrs = 10**((tmpcat[:, ::2]-tmpcat[:, 1::2])/-2.5)
 
