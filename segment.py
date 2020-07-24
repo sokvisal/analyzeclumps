@@ -6,7 +6,6 @@ from astropy.stats import sigma_clip
 import glob
 
 import astropy
-print (astropy.__version__)
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -104,6 +103,10 @@ def wscat(catdir, catname, path, tile, savedir=False):
                 segmap[abs(segmap-segmap[77,77])>0] = 0.
                 segmap = ndi.binary_fill_holes(segmap).astype(float)
 
+                # plt.imshow(matchimg*segmap)
+                # plt.scatter(tmpobjs[:,1],tmpobjs[:,0], marker='x', color='r')
+                # plt.show()
+
                 edges = roberts(segmap)
                 edges[edges>0] = 1
 
@@ -112,6 +115,8 @@ def wscat(catdir, catname, path, tile, savedir=False):
                 fit = fitEllipse(ex, ey, segmap)
                 tmpx, tmpy, a, b, phi = fit.getparams()
                 if not np.any(np.isnan([a,b,phi])):
+                    break
+                elif tmpsig<2:
                     break
             tmpsig -= 0.5
 
@@ -144,7 +149,7 @@ def wscat(catdir, catname, path, tile, savedir=False):
         if not os.path.isdir('./{}/a{}/watershed_segmaps'.format(path, tile)):
             os.makedirs('./{}/a{}/watershed_segmaps'.format(path, tile))
 
-        if savedir:
+        if savedir and not np.any(np.isnan([a,b,phi])):
             hdr = fits.Header()
             hdr['XC'] = tmpx
             hdr['YC'] = tmpy
@@ -156,6 +161,9 @@ def wscat(catdir, catname, path, tile, savedir=False):
             hdr['SEGMAP'] = 'Based on Ks'
             hdu = fits.PrimaryHDU(segmap, hdr)
             hdu.writeto('./{}/a{}/watershed_segmaps/_id-{}.fits'.format(path, tile, int(_id)), overwrite=True)
+        elif np.any(np.isnan([a,b,phi])):
+            filename = glob.glob('./{}/a{}/_id-{}*'.format(path, tile, int(_id)))[0]
+            shutil.move(filename, filename.replace(os.path.basename(filename), 'badphot/'+os.path.basename(filename)))
 
 def _get_photometric(z):
 
@@ -178,14 +186,14 @@ def _get_photometric(z):
 
     return urest #, svrest
 
-def ws_2maps(catname, path, tile, savedir=False):
+def ws_2maps(catdir, catname, path, tile, savedir=False):
     # load full catalog
-    allobjs = np.loadtxt('/mnt/drivea/run/cosmos_catalogs/cosmos_full_cat.dat', skiprows=1) #cosmos_full_cat
+    allobjs = np.loadtxt(catdir+'/cosmos_full_cat.dat', skiprows=1) #cosmos_full_cat
     objra = allobjs[:,2]
     objdec = allobjs[:,3]
 
     # load sfg catalogs
-    table = ascii.read('{}.dat'.format(catname)) #cosmos_sfgcat_extended_update
+    table = ascii.read(catdir+catname) #cosmos_sfgcat_extended_update
     try:
         catalogs = np.array([table['z'], table['id'], table['x'], table['y'], table['ra'], table['dec']]).T
     except KeyError:
@@ -201,9 +209,10 @@ def ws_2maps(catname, path, tile, savedir=False):
     _ids = list(catalogs[:,1])
 
     # load tile image
-    hdu = fits.open('/mnt/drivea/run/images/{}/{}-ultravista_Ks.fits'.format(tile, tile))
+    hdu = fits.open('../images/{}/{}-ultravista_Ks.fits'.format(tile, tile))
     imgks = hdu[0].data
     header = hdu[0].header
+    hdu.close()
     wcs = pywcs.WCS(header)
 
     # check extend of tile image
@@ -227,7 +236,6 @@ def ws_2maps(catname, path, tile, savedir=False):
     catalogs[:,3] = caty
 
     catalogs = catalogs[:]
-    print (catalogs.shape)
     for (_id,x,y,zphot) in zip(catalogs[:,1], catalogs[:,2], catalogs[:,3], catalogs[:,0]):
 
         size = 26
@@ -241,14 +249,16 @@ def ws_2maps(catname, path, tile, savedir=False):
 
 
         photo_fn = _get_photometric(zphot)
-        imgb = fits.open('/mnt/drivea/run/images/{}/{}-subaru_rp.fits'.format(tile, tile))[0].data
+        hdu = fits.open('../images/{}/{}-subaru_rp.fits'.format(tile, tile))
+        imgb = hdu[0].data
+        hdu.close()
         matchb = imgb[int(y)-size:int(y)+size, int(x)-size:int(x)+size]
         matchb = rescale(matchb, 156./52., mode='reflect', multichannel=False)*(52./156.)**2
     #     tmpdir = glob.glob('./selectedgal/resolved_sfgs/a{}/_id-{}*'.format(tile, int(_id)))[0]
     #     matchimg = fits.open('{}/subaru-zp_lambd-000100.0/g_1.fits'.format(tmpdir))[0].data
     #     matchimg = rescale(matchimg, 156./52., mode='reflect', multichannel=False)*(52./156.)**2
 
-        tmpsig = 3.
+        tmpsig = 3.5
         while True:
             masked = matchimg.copy()
             filtered = sigma_clip(matchimg, sigma=tmpsig, masked=True)
@@ -276,10 +286,8 @@ def ws_2maps(catname, path, tile, savedir=False):
                 segmap = smb+sm
                 segmap[segmap>0] = 1
 
-                # plt.imshow(sm)
-                # plt.show()
-                #
-                # plt.imshow(smb-sm)
+                # plt.imshow(matchimg*segmap, origin='lower')
+                # plt.scatter(tmpobjs[:,1],tmpobjs[:,0], marker='x', color='r')
                 # plt.show()
 
                 edges = roberts(segmap)
@@ -290,6 +298,8 @@ def ws_2maps(catname, path, tile, savedir=False):
                 fit = fitEllipse(ex, ey, sm)
                 tmpx, tmpy, a, b, phi = fit.getparams()
                 if not np.any(np.isnan([a,b,phi])):
+                    break
+                elif tmpsig < 2.:
                     break
             tmpsig -= 0.5
 
@@ -320,7 +330,7 @@ def ws_2maps(catname, path, tile, savedir=False):
         # ax.scatter(tmpx+ell[0,:], tmpy+ell[1,:], color='g', s=2)
         # plt.show()
 
-        if savedir:
+        if savedir and not np.any(np.isnan([a,b,phi])):
             if not os.path.isdir('./{}/a{}/watershed_segmaps'.format(path, tile)):
                 os.makedirs('./{}/a{}/watershed_segmaps'.format(path, tile))
 
@@ -335,6 +345,9 @@ def ws_2maps(catname, path, tile, savedir=False):
             hdr['SEGMAP'] = 'Based on Ks and r+'
             hdu = fits.PrimaryHDU(segmap, hdr)
             hdu.writeto('./{}/a{}/watershed_segmaps/_id-{}.fits'.format(path, tile, int(_id)), overwrite=True)
+        elif np.any(np.isnan([a,b,phi])):
+            filename = glob.glob('./{}/a{}/_id-{}*'.format(path, tile, int(_id)))[0]
+            shutil.move(filename, filename.replace(os.path.basename(filename), 'badphot/'+os.path.basename(filename)))
 
 class fitEllipse:
     def __init__(self, x, y, segmap):
@@ -398,8 +411,8 @@ class fitEllipse:
             yc = center[1]
 
             ell = ((xi-xc)*np.cos(phi)+(yi-yc)*np.sin(phi))**2./a**2 + ((xi-xc)*np.sin(phi)-(yi-yc)*np.cos(phi))**2./b**2
-
             tmpidx = np.where(ell<1)[0]
+
             return len(tmpidx)
 
         center = self.ellipse_center()
@@ -410,7 +423,6 @@ class fitEllipse:
         ## correct orientaiton
         masked = np.zeros(self.segmap.shape)
         masked[self.segmap==0] = np.nan
-
 
         a = np.max(axes)
         b = np.min(axes)
