@@ -17,7 +17,7 @@ import sys
 sys.path.insert(0, '/mnt/drivea/test/')
 
 from scipy import ndimage as ndi
-from skimage.morphology import watershed
+from skimage.segmentation import watershed
 from skimage.filters import roberts
 from scipy.signal import correlate
 from skimage.transform import rescale
