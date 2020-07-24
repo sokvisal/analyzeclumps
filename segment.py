@@ -12,7 +12,6 @@ import os
 
 import sys
 sys.path.insert(0, '/mnt/drivea/test/')
-import imutil
 
 from scipy import ndimage as ndi
 from skimage.morphology import watershed
