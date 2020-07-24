@@ -85,14 +85,13 @@ def getnoise(directories, path, imgfact=False):
 
         return noise
 
-    tmpdirs = [fdir for _dirs in glob.glob('./{}/'.format(path)+directories) for fdir in sorted(glob.glob(_dirs+'/*-*')) if len(glob.glob(_dirs+'/*-*'))==14][:] #*0.0
-    # print tmpdirs[:200]
+    tmpdirs = [fdir for _dirs in glob.glob('./{}/'.format(path)+directories) for fdir in sorted(glob.glob(_dirs+'/*-*'))][:]
     tmpdirs = np.array(tmpdirs).reshape(len(tmpdirs)/14, 14).T
 
     filternames = []
     sig = []
 
-    for _dirs in tqdm(tmpdirs):
+    for _dirs in tmpdirs:
         noise = aperture_rms(_dirs[:200], iter=2000., )
 
         r = [0.05,0.99]
@@ -113,8 +112,8 @@ def getnoise(directories, path, imgfact=False):
         # plt.plot(h[1][:h[0].shape[0]], errfun(p), label='error')
         # plt.show()
 
-    print (np.array(sig))
-    print (filternames)
+    # print (np.array(sig))
+    # print (filternames)
 
     tile = directories.split('/')[1]
     np.savetxt('./{}/{}/noise.txt'.format(path, tile), sig, header = ' '.join([str(elem) for elem in filternames]) )
@@ -157,7 +156,7 @@ def getnoisedis(directories, path, deconvOffset=False, offset=False):
         return data
 
     warnings.simplefilter("error", RuntimeWarning)
-    for d in tqdm(glob.glob('./{}/'.format(path)+directories)[:]):
+    for d in glob.glob('./{}/'.format(path)+directories)[:]:
         _id = os.path.basename(d).split('_')[1].split('-')[1]
         # tile = d.split('/')[4][1:]
 
@@ -366,18 +365,6 @@ def create_cat(directories, path, constrain=False, bin_data=True):
                 outbinNum, xNode, yNode, xBar, yBar, sn, nPixels, scale = voronoi_2d_binning(x, y, signal, noise, targetSN,\
                                                                         pixelsize=1., plot=1, quiet=1, cvt=1, wvt=1, sn_func=_sn_func, secsignal=bsig, secnoise=bn) #bphot=[bsig, bn],
                 print ('no signal, going to s/n of 3, ', max(outbinNum), d)
-            # outbinNum, xNode, yNode, xBar, yBar, sn, nPixels, scale = voronoi_2d_binning(outerx, outery, outersig, outernoise, targetSN,\
-            #                                                         pixelsize=1., plot=1, quiet=1, cvt=1, wvt=1, sn_func=_sn_func, secsignal=outerbsig, secnoise=outerbn)
-
-        # if max(outbinNum)<50 and targetSN == 5.:
-        #     targetSN = 3.
-        #     if not constrain:
-        #             outbinNum, xNode, yNode, xBar, yBar, sn, nPixels, scale = voronoi_2d_binning(x, y, signal, noise, targetSN,\
-        #                                                                     pixelsize=1., plot=1, quiet=1, cvt=1, wvt=1, sn_func=_sn_func, secsignal=None, secnoise=None)
-        #     else:
-        #         outbinNum, xNode, yNode, xBar, yBar, sn, nPixels, scale = voronoi_2d_binning(x, y, signal, noise, targetSN,\
-        #                                                                 pixelsize=1., plot=1, quiet=1, cvt=1, wvt=1, sn_func=_sn_func, secsignal=bsig, secnoise=bn) #bphot=[bsig, bn],
-        #     print 'low SN: ', max(outbinNum), d
 
         print (max(outbinNum), d)
         binNum = outbinNum
