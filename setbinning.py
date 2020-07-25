@@ -360,19 +360,19 @@ def create_cat(directories, path, constrain=False, bin_data=True):
             try:
                 targetSN = 5.
                 outbinNum, xNode, yNode, xBar, yBar, sn, nPixels, scale = voronoi_2d_binning(x, y, signal, noise, targetSN,\
-                                                                        pixelsize=1., plot=1, quiet=0, cvt=1, wvt=1, sn_func=_sn_func) #bphot=[bsig, bn],
+                                                                        pixelsize=1., plot=0, quiet=1, cvt=1, wvt=1, sn_func=_sn_func) #bphot=[bsig, bn],
             except:
                 targetSN = 3.
                 outbinNum, xNode, yNode, xBar, yBar, sn, nPixels, scale = voronoi_2d_binning(x, y, signal, noise, targetSN,\
-                                                                        pixelsize=1., plot=1, quiet=0, cvt=1, wvt=1, sn_func=_sn_func, secsignal=None, secnoise=None)
+                                                                        pixelsize=1., plot=0, quiet=1, cvt=1, wvt=1, sn_func=_sn_func, secsignal=None, secnoise=None)
         else:
             try:
                 outbinNum, xNode, yNode, xBar, yBar, sn, nPixels, scale = voronoi_2d_binning(x, y, signal, noise, targetSN,\
-                                                                        pixelsize=1., plot=1, quiet=0, cvt=1, wvt=1, sn_func=_sn_func, secsignal=bsig, secnoise=bn) #bphot=[bsig, bn],
+                                                                        pixelsize=1., plot=0, quiet=1, cvt=1, wvt=1, sn_func=_sn_func, secsignal=bsig, secnoise=bn) #bphot=[bsig, bn],
             except:
                 targetSN = 3.
                 outbinNum, xNode, yNode, xBar, yBar, sn, nPixels, scale = voronoi_2d_binning(x, y, signal, noise, targetSN,\
-                                                                        pixelsize=1., plot=1, quiet=0, cvt=1, wvt=1, sn_func=_sn_func, secsignal=bsig, secnoise=bn) #bphot=[bsig, bn],
+                                                                        pixelsize=1., plot=0, quiet=1, cvt=1, wvt=1, sn_func=_sn_func, secsignal=bsig, secnoise=bn) #bphot=[bsig, bn],
                 print ('no signal, going to s/n of 3, ', max(outbinNum), d)
 
         print (max(outbinNum), d)
