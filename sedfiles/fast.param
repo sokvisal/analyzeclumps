@@ -59,8 +59,8 @@
 #-----------------------------------------------------------------------
 
 VERBOSE         = 0         # 0 / 1
-PARALLEL        = 'generators'    # 'none', 'generators', 'models', or 'sources'
-N_THREAD        = 8
+PARALLEL        = 'none'    # 'none', 'generators', 'models', or 'sources'
+N_THREAD        = 1
 MAX_QUEUED_FITS = 1000
 
 #--- GENERAL INFORMATION -----------------------------------------------
