@@ -238,7 +238,7 @@ def ws_2maps(catdir, catname, path, tile, savedir=False):
 
     catalogs = catalogs[:]
     for (_id,x,y,zphot) in zip(catalogs[:,1], catalogs[:,2], catalogs[:,3], catalogs[:,0]):
-
+        print (_id)
         size = 26
         scale = 3
         tmpobjs = np.array(return_objcoord(wcs, [int(y), int(x)], size, [objra, objdec], scale=scale))
@@ -273,7 +273,7 @@ def ws_2maps(catdir, catname, path, tile, savedir=False):
             fb = fb.mask
             mb[fb==False] = np.nan
 
-            if not np.isnan(masked[77,77]):
+            if not np.isnan(masked[77,77]) and not np.isnan(mb[77,77]):
                 labels = watershed(-distance/np.sum(distance), markers, compactness=0.1, mask=filtered) #-masked/np.sum(masked)
                 sm = labels.copy()
                 sm[abs(sm-sm[77,77])>0] = 0.
@@ -287,7 +287,7 @@ def ws_2maps(catdir, catname, path, tile, savedir=False):
                 segmap = smb+sm
                 segmap[segmap>0] = 1
 
-                # plt.imshow(matchimg*segmap, origin='lower')
+                # plt.imshow(segmap, origin='lower')
                 # plt.scatter(tmpobjs[:,1],tmpobjs[:,0], marker='x', color='r')
                 # plt.show()
 
