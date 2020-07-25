@@ -50,10 +50,10 @@ def fit(path, tile):
     print ('Starting queue')
     wdir = os.getcwd()
 
-    for i in directories[:]:
+    for i in directories[212:213]:
 
         if not os.path.isfile(i+'/test_phot/fast.param'):
-            for dir in glob.glob('./sedfiles/*.param'):
+            for dir in glob.glob('../analyzeclumps/sedfiles/*.param'):
                 shutil.copyfile(dir, i+'/test_phot/{}'.format(os.path.basename(dir)))
             if os.path.isdir(i+'/test_phot/OUTPUT'):  shutil.rmtree(i+'/test_phot/OUTPUT')
             os.makedirs(i+'/test_phot/OUTPUT')
