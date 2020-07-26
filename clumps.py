@@ -15,11 +15,10 @@ cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
 from operator import itemgetter
 from astropy.io import fits
 
-%load_ext autoreload
-%autoreload 1
-%aimport structparams
-%aimport normprofiles
-%aimport misc
+
+import structparams
+import normprofiles
+import misc
 
 
 sfgs_cat = ascii.read('/hpcstorage/sok/run/cosmos_sfgs.dat') #cosmos_final_sfgcat
