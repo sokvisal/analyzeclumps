@@ -75,8 +75,9 @@ def wscat(catdir, catname, path, tile, savedir=False):
     catalogs[:,2] = catx
     catalogs[:,3] = caty
 
-    catalogs = catalogs[:]
-    for (_id,x,y) in zip(catalogs[:,1], catalogs[:,2], catalogs[:,3]):
+    catalogs = catalogs[328:]
+    for i, (_id,x,y) in enumerate(zip(catalogs[:,1], catalogs[:,2], catalogs[:,3])):
+        print (tile, i, _id)
 
         size = 26
         scale = 3
@@ -97,11 +98,13 @@ def wscat(catdir, catname, path, tile, savedir=False):
             distance = filtered.data
             filtered = filtered.mask
             masked[filtered==False] = np.nan
-            if not np.isnan(masked[77,77]):
+
+            idx = np.argmin((tmpobjs[:,1]-78)**2+(tmpobjs[:,0]-78)**2)
+            if not np.isnan(masked[int(tmpobjs[idx,0]),int(tmpobjs[idx,1])]): # idx 0 is y, 1 is x
                 labels = watershed(-distance/np.sum(distance), markers, compactness=0.1, mask=filtered) #-masked/np.sum(masked)
 
                 segmap = labels.copy()
-                segmap[abs(segmap-segmap[77,77])>0] = 0.
+                segmap[abs(segmap-segmap[int(tmpobjs[idx,0]),int(tmpobjs[idx,1])])>0] = 0.
                 segmap = ndi.binary_fill_holes(segmap).astype(float)
 
                 # plt.imshow(matchimg*segmap)
@@ -123,7 +126,7 @@ def wscat(catdir, catname, path, tile, savedir=False):
 
         ell = fit.plotEllipse(a, b, phi)
 
-        print (_id, a, b, phi)
+        # print (_id, a, b, phi)
         # nrow = 1
         # ncol = 4
         # imscale = 2.5
@@ -237,8 +240,8 @@ def ws_2maps(catdir, catname, path, tile, savedir=False):
     catalogs[:,3] = caty
 
     catalogs = catalogs[:]
-    for (_id,x,y,zphot) in zip(catalogs[:,1], catalogs[:,2], catalogs[:,3], catalogs[:,0]):
-        print (_id)
+    for i, (_id,x,y,zphot) in enumerate(zip(catalogs[:,1], catalogs[:,2], catalogs[:,3], catalogs[:,0])):
+        print (i, _id)
         size = 26
         scale = 3
         tmpobjs = np.array(return_objcoord(wcs, [int(y), int(x)], size, [objra, objdec], scale=scale))
@@ -273,23 +276,24 @@ def ws_2maps(catdir, catname, path, tile, savedir=False):
             fb = fb.mask
             mb[fb==False] = np.nan
 
-            if not np.isnan(masked[77,77]) and not np.isnan(mb[77,77]):
+            idx = np.argmin((tmpobjs[:,1]-78)**2+(tmpobjs[:,0]-78)**2)
+            if not np.isnan(masked[int(tmpobjs[idx,0]),int(tmpobjs[idx,1])]) and not np.isnan(mb[int(tmpobjs[idx,0]),int(tmpobjs[idx,1])]):
                 labels = watershed(-distance/np.sum(distance), markers, compactness=0.1, mask=filtered) #-masked/np.sum(masked)
                 sm = labels.copy()
-                sm[abs(sm-sm[77,77])>0] = 0.
+                sm[abs(sm-sm[int(tmpobjs[idx,0]),int(tmpobjs[idx,1])])>0] = 0.
                 sm = ndi.binary_fill_holes(sm).astype(float)
 
                 labels = watershed(-distb/np.sum(distb), markers, compactness=0.1, mask=fb) #-masked/np.sum(masked)
                 smb = labels.copy()
-                smb[abs(smb-smb[77,77])>0] = 0.
+                smb[abs(smb-smb[int(tmpobjs[idx,0]),int(tmpobjs[idx,1])])>0] = 0.
                 smb = ndi.binary_fill_holes(smb).astype(float)
 
                 segmap = smb+sm
                 segmap[segmap>0] = 1
 
-                # plt.imshow(segmap, origin='lower')
-                # plt.scatter(tmpobjs[:,1],tmpobjs[:,0], marker='x', color='r')
-                # plt.show()
+                plt.imshow(segmap*matchb, origin='lower')
+                plt.scatter(tmpobjs[:,1],tmpobjs[:,0], marker='x', color='r')
+                plt.show()
 
                 edges = roberts(segmap)
                 edges[edges>0] = 1
