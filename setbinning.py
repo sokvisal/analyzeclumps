@@ -169,10 +169,11 @@ def getnoisedis(directories, path, deconvOffset=False, offset=False):
         _id = os.path.basename(d).split('_')[1].split('-')[1]
         # tile = d.split('/')[4][1:]
 
-        segmap = fits.open('./{}/{}/watershed_segmaps/_id-{}.fits'.format(path, tile, _id))[0].data
+        # hdu = fits.open('./{}/{}/watershed_segmaps/_id-{}.fits'.format(path, tile, _id))
+        # segmap = hdu[0].data
+        # hdu.close()
         if deconvOffset: dec_offsets = ascii.read( './{}/offsets/_id-{}-dec.dat'.format(tile, int(_id)) )
         if offset: offsets = ascii.read( './{}/{}/offsets/_id-{}.dat'.format(path, tile, int(_id)) )
-
 
         for i, fdir in enumerate(sorted(glob.glob(d+'/*-*'))): #*.0
             filtname = os.path.basename(fdir).split('_')[0].replace('-', '_')
@@ -186,7 +187,9 @@ def getnoisedis(directories, path, deconvOffset=False, offset=False):
                 gain = 4.
                 scaling = scalings[1]
 
-            data = fits.open(fdir+'/deconv_01.fits')[0].data#*scaling
+            hdu = fits.open(fdir+'/deconv_01.fits')
+            data = hdu[0].data#*scaling
+            hdu.close()
             # data[segmap==0] = 0
             if deconvOffset: data = _return_offseted_data(dec_offsets, filtname, data)
             if offset: data = _return_offseted_data(offsets, filtname, data)
@@ -199,13 +202,13 @@ def getnoisedis(directories, path, deconvOffset=False, offset=False):
             except RuntimeWarning :
                 noise = np.ones(data.shape)*np.sqrt(sig[i]**2)
                 count += 1
-                if 'B' not in filtname: print ('aperture noise less than poison noise: '+filtname)
+                # if 'B' not in filtname: print ('aperture noise less than poison noise: '+filtname)
 
             y, x = np.indices(noise.shape)
-            savedata = np.array([y.ravel()[zeroidx], x.ravel()[zeroidx], data.ravel()[zeroidx]*scaling, noise.ravel()[zeroidx]*scaling]).T
+            savedata = np.c_[y.ravel()[zeroidx], x.ravel()[zeroidx], data.ravel()[zeroidx]*scaling, noise.ravel()[zeroidx]*scaling]#.T
 
-            with open(fdir+'/vorbin_input.txt', 'w+') as datafile_id:
-                np.savetxt(datafile_id, savedata, fmt=['%f','%f', '%f','%f'])
+            # with open(fdir+'/vorbin_input.txt', 'w+') as datafile_id:
+            np.save(fdir+'/vorbin_input.txt', savedata) #savedata, fmt=['%f','%f', '%f','%f'])
 
 def create_cat(directories, path, constrain=False, bin_data=True):
     from vorbin.voronoi_2d_binning import voronoi_2d_binning
