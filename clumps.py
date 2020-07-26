@@ -95,7 +95,7 @@ def _return_photometry(directory, z):
 #     svrest = svrest.clip(0.01)
     return surest, svrest
 
-def stellarPopMaps(directory):
+def stellarPopMaps(directory, path):
 
     tile = directory.split('/')[-2][1:]
     idnum = int(os.path.basename(directory).split('_')[1].split('-')[1])
@@ -212,7 +212,7 @@ def retrieved_maps(directories, path):
             offsets = ascii.read('./{}/a{}/offsets/_id-{}.dat'.format(path, tile, idnum) )
             rgbimg = misc.returnRGB(d, offsets)
 
-            boolcheck = stellarPopMaps(d)
+            boolcheck = stellarPopMaps(d, path)
             if type(boolcheck) == type(True):
                 badcounts += 1
             else:
