@@ -269,7 +269,7 @@ def getHST(directory, medianlist=False):
 
     def create_rgb(b, g, r, scalemin, scale='linear'):
         import sys
-        sys.path.insert(0, '../../test/')
+        sys.path.insert(0, './')
         import img_scale
         img = np.zeros((r.shape[0], r.shape[1], 3), dtype=float)
 
