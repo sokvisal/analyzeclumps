@@ -22,7 +22,7 @@ import misc
 
 
 sfgs_cat = ascii.read('/hpcstorage/sok/run/cosmos_sfgs.dat') #cosmos_final_sfgcat
-fout = ascii.read('/hpcstorage/sok/run/UVISTA_fast++/UVISTA_final_v4.1_selected.fout')
+fout = ascii.read('/hpcstorage/sok/run/UVISTA_final_v4.1_selected.fout')
 _ids = sfgs_cat['id'].data
 
 def getMSFR(idnum):
