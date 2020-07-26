@@ -187,7 +187,7 @@ def getnoisedis(directories, path, deconvOffset=False, offset=False):
                 scaling = scalings[1]
 
             data = fits.open(fdir+'/deconv_01.fits')[0].data#*scaling
-            data[segmap==0] = 0
+            # data[segmap==0] = 0
             if deconvOffset: data = _return_offseted_data(dec_offsets, filtname, data)
             if offset: data = _return_offseted_data(offsets, filtname, data)
             zeroidx = np.where(data.ravel()!=0)[0]
@@ -368,11 +368,11 @@ def create_cat(directories, path, constrain=False, bin_data=True):
         else:
             try:
                 outbinNum, xNode, yNode, xBar, yBar, sn, nPixels, scale = voronoi_2d_binning(x, y, signal, noise, targetSN,\
-                                                                        pixelsize=1., plot=0, quiet=1, cvt=1, wvt=1, sn_func=_sn_func, secsignal=bsig, secnoise=bn) #bphot=[bsig, bn],
+                                                                        pixelsize=1., plot=0, quiet=1, cvt=0, wvt=1, sn_func=_sn_func, secsignal=bsig, secnoise=bn) #bphot=[bsig, bn],
             except:
                 targetSN = 3.
                 outbinNum, xNode, yNode, xBar, yBar, sn, nPixels, scale = voronoi_2d_binning(x, y, signal, noise, targetSN,\
-                                                                        pixelsize=1., plot=0, quiet=1, cvt=1, wvt=1, sn_func=_sn_func, secsignal=bsig, secnoise=bn) #bphot=[bsig, bn],
+                                                                        pixelsize=1., plot=0, quiet=1, cvt=0, wvt=1, sn_func=_sn_func, secsignal=bsig, secnoise=bn) #bphot=[bsig, bn],
                 print ('no signal, going to s/n of 3, ', max(outbinNum), d)
 
         print (max(outbinNum), d)
