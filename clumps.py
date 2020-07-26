@@ -200,7 +200,7 @@ def retrieved_maps(directories, path):
     badcounts = 0
     tmpdirs = [idnames for idnames in glob.glob(directories)[:] if len(glob.glob(idnames+'/*-*'))==14]
 #     print [int(os.path.basename(idnames.split('_')[1].split('-')[1])) for idnames in glob.glob(directories)[:] if len(glob.glob(idnames+'/*-*'))==14]
-    for d in tqdm(tmpdirs[212:213]): #glob.glob(directories)[:]
+    for d in tmpdirs[:]: #glob.glob(directories)[:]
         idnum = int(os.path.basename(d).split('_')[1].split('-')[1])
         zp = float(os.path.basename(d).split('_')[2].split('-')[1])
         tmpmass = getMSFR(idnum)[0]
@@ -241,7 +241,7 @@ def retrieved_maps(directories, path):
                 newcat_clumps.append([idnum, zp,  galmass_idl, mass, galsfr] + clumpids + ccs + diagnostics)
 
 #                 if abs(galmass_idl-mass)>0.3:
-                print (idnum, galmass_idl, mass)
+                print (d, galmass_idl, mass)
 #                 misc.tmpsedfits(d, binshape)
 
                 master_mmap.append(normmaps[0][2:])
