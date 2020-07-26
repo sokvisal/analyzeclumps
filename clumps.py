@@ -201,6 +201,7 @@ def retrieved_maps(directories, path):
     tmpdirs = [idnames for idnames in glob.glob(directories)[:] if len(glob.glob(idnames+'/*-*'))==14]
 #     print [int(os.path.basename(idnames.split('_')[1].split('-')[1])) for idnames in glob.glob(directories)[:] if len(glob.glob(idnames+'/*-*'))==14]
     for d in tqdm(tmpdirs[212:213]): #glob.glob(directories)[:]
+        print (d)
         idnum = int(os.path.basename(d).split('_')[1].split('-')[1])
         zp = float(os.path.basename(d).split('_')[2].split('-')[1])
         tmpmass = getMSFR(idnum)[0]
