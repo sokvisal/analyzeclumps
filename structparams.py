@@ -131,8 +131,8 @@ def setup_profile(center, a, b, phi, physvars, photvars, zphot, weightmap=False)
     # yc = 76.87529007968351
     # xc = 79.06927075639413
     # print yc, xc
-    cmask = createCircularMask(lm.shape[0], lm.shape[0], radius=14)
-    masstot = np.log10(np.nansum(10**(lm)))
+    cmask = createCircularMask(lm.shape[0], lm.shape[0], radius=21)
+    masstot = np.log10(np.nansum(10**(lm*cmask)))
     # phi = pa
     e = np.sqrt(1-b**2/a**2)
 
