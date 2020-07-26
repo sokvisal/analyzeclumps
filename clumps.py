@@ -253,9 +253,8 @@ def retrieved_maps(directories, path):
 
 
 def createCat(decpath, tile):
-    path = './deconv'
-    dirname = './{}/{}/_id*'.format(path, tile)
-    normalizedprofile, physicals, selzp, test_lst, ids_clumps = retrieved_maps(dirname, path)
+    dirname = './{}/{}/_id*'.format(decpath, tile)
+    normalizedprofile, physicals, selzp, test_lst, ids_clumps = retrieved_maps(dirname, decpath)
 
     ids_clumps = np.array(ids_clumps)
 
