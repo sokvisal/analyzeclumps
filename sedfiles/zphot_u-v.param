@@ -1,7 +1,7 @@
 #### EAZY Default parameters
 
 ## Filters
-FILTERS_RES          /usr/local/fastpp/share/FILTER.RES.latest  # Filter transmission data
+FILTERS_RES          /home/epfl/sok/.local/fastpp/share/FILTER.RES.latest  # Filter transmission data
 FILTER_FORMAT        1                  # Format of FILTERS_RES file -- 0: energy-  1: photon-counting detector
 SMOOTH_FILTERS       n                  # Smooth filter curves with Gaussian
 SMOOTH_SIGMA         100.               # Gaussian sigma (in Angstroms) to smooth filters
@@ -31,7 +31,7 @@ CACHE_FILE           photz.tempfilt     # Template cache file (in OUTPUT_DIRECTO
 CATALOG_FILE         cosmos.cat         # Catalog data file
 MAGNITUDES           n                  # Catalog photometry in magnitudes rather than f_nu fluxes
 NOT_OBS_THRESHOLD    -90                # Ignore flux point if <NOT_OBS_THRESH
-N_MIN_COLORS         12                  # Require N_MIN_COLORS to fit
+N_MIN_COLORS         10                  # Require N_MIN_COLORS to fit
 
 ## Output Files
 OUTPUT_DIRECTORY     OUTPUT             # Directory to put output files in
@@ -45,15 +45,15 @@ POFZ_FILE            n                  # Write out Pofz/object, .pz
 BINARY_OUTPUT        y                  # Save OBS_SED, TEMP_SED, PZ in binary format to read with e.g IDL
 
 ## Redshift / Mag prior
-APPLY_PRIOR          n                 # Apply apparent magnitude prior
-PRIOR_FILE           templates/prior_K_extend.dat # File containing prior grid
+APPLY_PRIOR          y                 # Apply apparent magnitude prior
+PRIOR_FILE           templates/prior_K_zmax7.dat # File containing prior grid
 PRIOR_FILTER         226               # Filter from FILTER_RES corresponding to the columns in PRIOR_FILE
 PRIOR_ABZP           25.               # AB zeropoint of fluxes in catalog.  Needed for calculating apparent mags!
 
 ## Redshift Grid
 FIX_ZSPEC            n                  # Fix redshift to catalog zspec
-Z_MIN                0.3                # Minimum redshift
-Z_MAX                2.3                # Maximum redshift
+Z_MIN                0.1                # Minimum redshift
+Z_MAX                3.0                # Maximum redshift
 Z_STEP               0.01               # Redshift step size
 Z_STEP_TYPE          1                  #  0 = ZSTEP, 1 = Z_STEP*(1+z)
 
