@@ -9,7 +9,7 @@ def fit(path, tile):
     print ('Starting queue')
     wdir = os.getcwd()
 
-    for i in directories[:1]:
+    for i in directories[:200]:
 
         if os.path.isdir(i+'/test_phot'):
             for dir in glob.glob('../analyzeclumps/sedfiles/*.param'):
