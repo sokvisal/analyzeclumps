@@ -24,7 +24,8 @@ def fit(path, tile):
 
             zphotparams = ['zphot_2800-u.param', 'zphot_u-v.param']
             for param in zphotparams:
-                ezycmd = ['/home/epfl/sok/.local/eazy-photoz/src/eazy', param]
+                shutil.copyfile(param, 'zphot.param')
+                ezycmd = ['/home/epfl/sok/.local/eazy-photoz/src/eazy', 'zphot.param']
 
                 f = open('eazy.log', 'w')
                 subprocess.call(ezycmd, stdout=f)
