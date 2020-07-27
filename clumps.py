@@ -133,6 +133,13 @@ def stellarPopMaps(directory, path):
         umag = 10**(((5*np.log10(cosmo.luminosity_distance(zp).value*1e5)+umag)-25.)/(-2.5))
         vmag = 10**(((5*np.log10(cosmo.luminosity_distance(zp).value*1e5)+vmag)-25.)/(-2.5))
 
+        umag,vmag = np.loadtxt(directory+'/test_phot/OUTPUT/cosmos.153-155.rf', usecols=(5,6), unpack=True)
+        l2800 = np.loadtxt(directory+'/test_phot/OUTPUT/cosmos.219-153.rf', usecols=(5,), unpack=True)
+
+        l2800[l2800==-99.] = 1e-10
+        umag[umag==-99.] = 1e-10
+        vmag[vmag==-99.] = 1e-10
+
         binmap = np.ones((size,size))
         physvars = np.zeros((3,size,size))*np.nan
         photvars = np.zeros((3,size,size))*np.nan
@@ -200,7 +207,7 @@ def retrieved_maps(directories, path):
     badcounts = 0
     tmpdirs = [idnames for idnames in glob.glob(directories)[:] if len(glob.glob(idnames+'/*-*'))==14]
 #     print [int(os.path.basename(idnames.split('_')[1].split('-')[1])) for idnames in glob.glob(directories)[:] if len(glob.glob(idnames+'/*-*'))==14]
-    for d in tmpdirs[:]: #glob.glob(directories)[:]
+    for d in tmpdirs[:200]: #glob.glob(directories)[:]
         idnum = int(os.path.basename(d).split('_')[1].split('-')[1])
         zp = float(os.path.basename(d).split('_')[2].split('-')[1])
         tmpmass = getMSFR(idnum)[0]
