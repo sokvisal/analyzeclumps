@@ -15,7 +15,7 @@ def fit(path, tile):
             for dir in glob.glob('../analyzeclumps/sedfiles/*.param'):
                 shutil.copyfile(dir, i+'/test_phot/{}'.format(os.path.basename(dir)))
             if os.path.isdir(i+'/test_phot/templates'): pass
-            else: shutil.copytree('./sedfiles/templates', i+'/test_phot/templates')
+            else: shutil.copytree('../analyzeclumps/sedfiles/templates', i+'/test_phot/templates')
             if os.path.isdir(i+'/test_phot/OUTPUT'):  shutil.rmtree(i+'/test_phot/OUTPUT')
             os.makedirs(i+'/test_phot/OUTPUT')
 
