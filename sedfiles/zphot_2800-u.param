@@ -47,7 +47,7 @@ BINARY_OUTPUT        y                  # Save OBS_SED, TEMP_SED, PZ in binary f
 ## Redshift / Mag prior
 APPLY_PRIOR          y                  # Apply apparent magnitude prior
 PRIOR_FILE           templates/prior_K_zmax7.dat # File containing prior grid
-PRIOR_FILTER         226               # Filter from FILTER_RES corresponding to the columns in PRIOR_FILE
+PRIOR_FILTER         259               # Filter from FILTER_RES corresponding to the columns in PRIOR_FILE
 PRIOR_ABZP           25.               # AB zeropoint of fluxes in catalog.  Needed for calculating apparent mags!
 
 ## Redshift Grid
