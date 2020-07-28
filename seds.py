@@ -9,7 +9,7 @@ def fit(path, tile):
     print ('Starting queue')
     wdir = os.getcwd()
 
-    for i in directories[:200]:
+    for i in tqdm(directories[:200]):
 
         if os.path.isdir(i+'/test_phot'):
             for dir in glob.glob('../analyzeclumps/sedfiles/*.param'):
@@ -30,9 +30,9 @@ def fit(path, tile):
                 f = open('eazy.log', 'w')
                 subprocess.call(ezycmd, stdout=f)
 
-            # cmd = ['/home/epfl/sok/.local/fastpp/bin/fast++', 'fast.param']
-            # f = open('fast.log', 'w')
-            # subprocess.call(cmd)
+            cmd = ['/home/epfl/sok/.local/fastpp/bin/fast++', 'fast.param']
+            f = open('fast.log', 'w')
+            subprocess.call(cmd)
 
             os.chdir(wdir)
         else:
