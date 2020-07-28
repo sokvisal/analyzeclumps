@@ -75,7 +75,7 @@ def wscat(catdir, catname, path, tile, savedir=False):
     catalogs[:,2] = catx
     catalogs[:,3] = caty
 
-    catalogs = catalogs[328:]
+    catalogs = catalogs[:]
     for i, (_id,x,y) in enumerate(zip(catalogs[:,1], catalogs[:,2], catalogs[:,3])):
         print (tile, i, _id)
 
@@ -91,7 +91,7 @@ def wscat(catdir, catname, path, tile, savedir=False):
     #     matchimg = fits.open('{}/subaru-zp_lambd-000100.0/g_1.fits'.format(tmpdir))[0].data
     #     matchimg = rescale(matchimg, 156./52., mode='reflect', multichannel=False)*(52./156.)**2
 
-        tmpsig = 3.5
+        tmpsig = 4.
         while True:
             masked = matchimg.copy()
             filtered = sigma_clip(matchimg, sigma=tmpsig, masked=True)
