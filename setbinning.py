@@ -165,13 +165,13 @@ def getnoisedis(directories, path, deconvOffset=False, offset=False):
         return data
 
     warnings.simplefilter("error", RuntimeWarning)
-    for d in glob.glob('./{}/'.format(path)+directories)[:]:
+    for d in tqdm(glob.glob('./{}/'.format(path)+directories)[:200]):
         _id = os.path.basename(d).split('_')[1].split('-')[1]
         # tile = d.split('/')[4][1:]
 
-        # hdu = fits.open('./{}/{}/watershed_segmaps/_id-{}.fits'.format(path, tile, _id))
-        # segmap = hdu[0].data
-        # hdu.close()
+        hdu = fits.open('./{}/{}/watershed_segmaps/_id-{}.fits'.format(path, tile, _id))
+        segmap = hdu[0].data
+        hdu.close()
         if deconvOffset: dec_offsets = ascii.read( './{}/offsets/_id-{}-dec.dat'.format(tile, int(_id)) )
         if offset: offsets = ascii.read( './{}/{}/offsets/_id-{}.dat'.format(path, tile, int(_id)) )
 
@@ -190,7 +190,7 @@ def getnoisedis(directories, path, deconvOffset=False, offset=False):
             hdu = fits.open(fdir+'/deconv_01.fits')
             data = hdu[0].data#*scaling
             hdu.close()
-            # data[segmap==0] = 0
+            data[segmap==0] = 0
             if deconvOffset: data = _return_offseted_data(dec_offsets, filtname, data)
             if offset: data = _return_offseted_data(offsets, filtname, data)
             zeroidx = np.where(data.ravel()!=0)[0]
@@ -207,8 +207,8 @@ def getnoisedis(directories, path, deconvOffset=False, offset=False):
             y, x = np.indices(noise.shape)
             savedata = np.c_[y.ravel()[zeroidx], x.ravel()[zeroidx], data.ravel()[zeroidx]*scaling, noise.ravel()[zeroidx]*scaling]#.T
 
-            # if os.path.isfile(fdir+'/vorbin_input.txt.npy'):
-            #     os.remove(fdir+'/vorbin_input.txt.npy')
+            if os.path.isfile(fdir+'/vorbin_input.txt.npy'):
+                os.remove(fdir+'/vorbin_input.txt.npy')
             # with open(fdir+'/vorbin_input.txt', 'w+') as datafile_id:
             np.savetxt(fdir+'/vorbin_input.txt', savedata) #savedata, fmt=['%f','%f', '%f','%f'])
 
@@ -371,14 +371,8 @@ def create_cat(directories, path, constrain=False, bin_data=True):
                 outbinNum, xNode, yNode, xBar, yBar, sn, nPixels, scale = voronoi_2d_binning(x, y, signal, noise, targetSN,\
                                                                         pixelsize=1., plot=0, quiet=1, cvt=1, wvt=1, sn_func=_sn_func, secsignal=None, secnoise=None)
         else:
-            try:
-                outbinNum, xNode, yNode, xBar, yBar, sn, nPixels, scale = voronoi_2d_binning(x, y, signal, noise, targetSN,\
-                                                                        pixelsize=1., plot=0, quiet=1, cvt=0, wvt=1, sn_func=_sn_func, secsignal=bsig, secnoise=bn) #bphot=[bsig, bn],
-            except:
-                targetSN = 3.
-                outbinNum, xNode, yNode, xBar, yBar, sn, nPixels, scale = voronoi_2d_binning(x, y, signal, noise, targetSN,\
-                                                                        pixelsize=1., plot=0, quiet=1, cvt=0, wvt=1, sn_func=_sn_func, secsignal=bsig, secnoise=bn) #bphot=[bsig, bn],
-                print ('no signal, going to s/n of 3, ', max(outbinNum), d)
+            outbinNum, xNode, yNode, xBar, yBar, sn, nPixels, scale = voronoi_2d_binning(x, y, signal, noise, targetSN,\
+                                                                    pixelsize=1., plot=0, quiet=1, cvt=0, wvt=1, sn_func=_sn_func, secsignal=bsig, secnoise=bn) #bphot=[bsig, bn],
 
         print (max(outbinNum), d)
         binNum = outbinNum
@@ -444,7 +438,7 @@ def create_cat(directories, path, constrain=False, bin_data=True):
     # print 1/0.
     _dirs = [idnames for idnames in glob.glob('./{}/'.format(path)+directories) if len(glob.glob(idnames+'/*-*'))==14]
     # print _dirs
-    for d in tqdm(_dirs[:]):
+    for d in tqdm(_dirs[:200]):
         phot_param = vbin(d) # if voronoi binning
         _save_cat(d, '/cosmos.cat', phot_param)
 
