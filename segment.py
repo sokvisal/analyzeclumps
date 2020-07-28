@@ -91,7 +91,7 @@ def wscat(catdir, catname, path, tile, savedir=False):
     #     matchimg = fits.open('{}/subaru-zp_lambd-000100.0/g_1.fits'.format(tmpdir))[0].data
     #     matchimg = rescale(matchimg, 156./52., mode='reflect', multichannel=False)*(52./156.)**2
 
-        tmpsig = 4.
+        tmpsig = 3.
         while True:
             masked = matchimg.copy()
             filtered = sigma_clip(matchimg, sigma=tmpsig, masked=True)
