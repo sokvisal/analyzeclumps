@@ -19,8 +19,8 @@ def make_profile(rgb_img, maps, normmaps, params, titleparams, tile, outerflux=[
     vNorm = normmaps[3]
     xc, yc, ell_mh, ell_mf, ell_2800h, ell_2800f, ell_uh, ell_uf, ell_vh, ell_vf = params
 
-    vmin=0.0#np.nanmin(uvrest)
-    vmax=2.#np.nanmax(uvrest)
+    vmin=-0.25#np.nanmin(uvrest)
+    vmax=2.5#np.nanmax(uvrest)
 
     tmpx = np.arange(-0.5, 2.0, 0.1)
     slope = 1.
@@ -446,11 +446,11 @@ def make_profile(rgb_img, maps, normmaps, params, titleparams, tile, outerflux=[
         # ax.set_xlabel('log(R/R$_e$)')
         # ax.axis('off')
 
-        if not os.path.isdir('{}/tmpplots2'.format(savedir)):
-            os.makedirs('{}/tmpplots2'.format(savedir))
+        if not os.path.isdir('{}'.format(savedir)):
+            os.makedirs('{}'.format(savedir))
 
         if savedir:
-            plt.savefig('./tmpplots/{}/_id-{}.jpg'.format(tile, titleparams[1]), bbox_inches='tight',dpi=300)
+            plt.savefig('{}/_id-{}.jpg'.format(savedir, titleparams[1]), bbox_inches='tight',dpi=300)
             # print './tmpplots/_id-{}.jpg'.format(titleparams[1])
             plt.close()
         elif showplot and not savedir:
@@ -458,12 +458,6 @@ def make_profile(rgb_img, maps, normmaps, params, titleparams, tile, outerflux=[
             plt.close()
         else:
             plt.close()
-        # ax8.xaxis.set_major_locator(MaxNLocator(5))
-
-        # if save is None: plt.show()
-        # else:
-        #     save.savefig(fig, dpi=300, bbox_inches = 'tight')
-        #     plt.close()
 
     # nrow = 1
     # ncol = 4
@@ -482,8 +476,8 @@ def make_profile(rgb_img, maps, normmaps, params, titleparams, tile, outerflux=[
     # plt.show()
 
 
-    cc_sm = clumps_contribution(uNorm[0], uNorm[1], sfr, clumpmap_u_r)
-    cc_sfr = clumps_contribution(uNorm[0], uNorm[1], sm, clumpmap_u_r)
+    cc_sm = clumps_contribution(uNorm[0], uNorm[1], sm, clumpmap_u_r)
+    cc_sfr = clumps_contribution(uNorm[0], uNorm[1], sfr, clumpmap_u_r)
 
     clumpiness = np.sum(uravel[clumpmap_u_r==3])/np.sum(uravel)
 
