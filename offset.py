@@ -30,6 +30,134 @@ def create_rgb(b, g, r, scalemin, scale='linear'):
 # catname = 'cosmos_sfgs.dat' #cosmos_close40
 # path = './deconv'
 
+def get_offsets(catdir, catname, tile, path):
+    from skimage.transform import resize
+    from skimage import img_as_bool
+    from scipy.signal import correlate
+
+    if not os.path.isdir('./{}/a{}/offsets'.format(path, tile)):
+        os.makedirs('./{}/a{}/offsets'.format(path, tile))
+
+    tmpcat = np.loadtxt(catdir+catname, skiprows=1, usecols=[i for i in np.arange(11,43)])
+    _ids = np.loadtxt(catdir+catname, skiprows=1, usecols=[0])
+    _ids = list(_ids)
+    snrs = 10**((tmpcat[:, ::2]-tmpcat[:, 1::2])/-2.5)
+
+    def getSNR(_id, idx, snrcat):
+        fluxes = [1,2,3,4,13,6,12,7,11,15,10,8,14] # making sure to retrieve the right flux
+        id_idx = _ids.index(_id)
+        return snrcat[id_idx, fluxes[idx]]
+
+    bands = ['subaru-IA427', 'subaru-B', 'subaru-IA484', 'subaru-IA505', 'subaru-IA527', 'subaru-V', 'subaru-IA624',\
+             'subaru-rp', 'subaru-IA738', 'subaru-zp', 'ultravista-Y', 'ultravista-J', 'ultravista-H']
+
+    for dirname in tqdm(glob.glob('./{}/a{}/_id*'.format(path, tile))[:]):
+        # print (dirname)
+        _id = int(os.path.basename(dirname).split('-')[1].split('_')[0])
+        idx = _ids.index(_id)
+
+        hdu = fits.open(glob.glob('{}/ultravista-Ks*/g_1.fits'.format(dirname))[0])
+        matchimg = hdu[0].data
+        hdu.close()
+
+        hdu = fits.open(glob.glob('{}/ultravista-Ks*/deconv_01.fits'.format(dirname))[0])
+        matchdec = hdu[0].data
+        hdu.close()
+
+        hdu = fits.open('./{}/a{}/watershed_segmaps/_id-{}.fits'.format(path, tile, _id))
+        segmap = hdu[0].data
+        segmap_coarse = img_as_bool(resize(segmap, (52, 52)))
+        hdu.close()
+
+        offsetcoords = []
+        offsetcoords_dec = []
+        tmplist = []
+        skipdata = False
+        for j, band in enumerate(bands[::-1]):
+            hdu = fits.open(glob.glob('{}/{}*/g_1.fits'.format(dirname,band))[0])
+            tmpimg = hdu[0].data
+            hdu.close()
+
+            hdu = fits.open(glob.glob('{}/{}*/deconv_01.fits'.format(dirname,band))[0])
+            tmpdec = hdu[0].data
+            hdu.close()
+
+            if np.isnan(tmpimg).any():
+                skipdata = True
+
+            snr = getSNR(_id, j, snrs)
+            if snr < 5:
+                dy = 0.0
+                dx = 0.0
+                matchimg = tmpimg
+            else:
+                correlation = correlate(tmpimg, matchimg, method='fft')
+                tmpy, tmpx = np.unravel_index(np.argmax(correlation), correlation.shape)
+                # maxy, maxx = np.unravel_index(np.argmax(tmpimg*segmap), tmpimg.shape)\
+
+                dy = correlation.shape[0]/2-tmpy
+                dx = correlation.shape[0]/2-tmpx
+
+                if snr > 5 and np.sqrt(dy**2 + dx**2) > 3:
+                    correlation = correlate(tmpimg*segmap_coarse, matchimg*segmap_coarse, mode='same', method='fft')
+                    tmpy, tmpx = np.unravel_index(np.argmax(correlation*segmap_coarse), correlation.shape)
+
+                    dy = (correlation.shape[0]/2.-tmpy)
+                    dx = (correlation.shape[0]/2.-tmpx)
+
+            tmpimg = np.roll(tmpimg, int(dy), 0)
+            tmpimg = np.roll(tmpimg, int(dx), 1)
+            matchimg = tmpimg
+            tmplist.append(matchimg)
+
+            tmpdec = np.roll(tmpdec, 3*int(dy), 0)
+            tmpdec = np.roll(tmpdec, 3*int(dx), 1)
+            if snr < 5:
+                dy = 0.0
+                dx = 0.0
+                matchimg = tmpimg
+            else:
+                correlation = correlate(tmpdec, matchdec, mode='same', method='fft')
+                tmpy, tmpx = np.unravel_index(np.argmax(correlation*segmap), correlation.shape)
+
+                dy_dec = (tmpdec.shape[0]/2.-tmpy)
+                dx_dec = (tmpdec.shape[0]/2.-tmpx)
+
+                # print (band, dy_dec, dx_dec, dirname)
+            tmpdec = np.roll(tmpdec, int(dy_dec), 0)
+            tmpdec = np.roll(tmpdec, int(dx_dec), 1)
+            matchdec = tmpdec
+
+            if snr > 5 and np.sqrt(dy**2 + dx**2) > 5:
+                print ('####################')
+                print ('####################')
+                print (band, dy, dx, dirname)
+                plt.subplot(131)
+                plt.imshow(tmpimg, origin='lower')
+                plt.subplot(132)
+                plt.imshow(matchimg, origin='lower')
+                plt.subplot(133)
+                plt.imshow(tmplist[j-1], origin='lower')
+                plt.show()
+                plt.close()
+                print ('####################')
+                print ('####################')
+            offsetcoords.append([dy,dx])
+            offsetcoords_dec.append([dy_dec,dx_dec])
+
+        if skipdata:
+            shutil.move(_dir, _dir.replace(filename, 'badphot/{}'.format(filename)))
+        else:
+            offsetcoords = np.array(offsetcoords)
+            offsetTab = Table([offsetcoords[:,i] for i in range(2)], names=('dy', 'dx'), meta={'name': 'offset in pixels'})
+            ascii.write(offsetTab, './{}/a{}/offsets/_id-{}.dat'.format(path, tile, int(_id)),\
+                        overwrite=True, format='commented_header')
+
+            offsetcoords_dec = np.array(offsetcoords_dec)
+            offsetTab = Table([offsetcoords_dec[:,i] for i in range(2)], names=('dy', 'dx'), meta={'name': 'offset in pixels (deconvolved)'})
+            ascii.write(offsetTab, './{}/a{}/offsets/_id-{}-dec.dat'.format(path, tile, int(_id)),\
+                        overwrite=True, format='commented_header')
+
 def return_offsets(catdir, catname, tile, path):
 
     table = ascii.read(catdir+catname) #cosmos_sfgcat_extended_update
