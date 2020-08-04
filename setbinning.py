@@ -128,7 +128,7 @@ def getnoise(directories, path, imgfact=False):
     np.savetxt('./{}/{}/noise.txt'.format(path, tile), sig, header = ' '.join([str(elem) for elem in filternames]) )
 
 
-def getnoisedis(directories, path, deconvOffset=False, offset=False):
+def getnoisedis(directories, path, catpath, deconvOffset=False, offset=False):
     import scipy.stats.mstats, scipy.optimize
     import pylab
     import glob
@@ -145,8 +145,8 @@ def getnoisedis(directories, path, deconvOffset=False, offset=False):
     print (sig)
     # print (1/0.)
 
-    tmpcat = np.loadtxt('/mnt/drivea/run/cosmos/cosmos_sfgs.dat', skiprows=1, usecols=[i for i in np.arange(11,43)])
-    _ids = np.loadtxt('/mnt/drivea/run/cosmos/cosmos_sfgs.dat', skiprows=1, usecols=[0])
+    tmpcat = np.loadtxt(catpath, skiprows=1, usecols=[i for i in np.arange(11,43)])
+    _ids = np.loadtxt(catpath, skiprows=1, usecols=[0])
     _ids = list(_ids)
     snrs = 10**((tmpcat[:, ::2]-tmpcat[:, 1::2])/-2.5)
     fluxes = 10**((tmpcat[:, ::2]-25)/-2.5)
