@@ -1036,7 +1036,7 @@ def search_cfg(filename, dic):
             if line[-1] != '\n':
                 line += '\n'
             name, val = line.split("=")
-            name, val = string.strip(name), string.strip(val)
+            name, val = name.strip(), val.strip()
             if name in dic:
                 return val
 
