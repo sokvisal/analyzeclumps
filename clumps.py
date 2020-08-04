@@ -129,9 +129,9 @@ def stellarPopMaps(directory, path):
         return False
     else:
         lsfr[lsfr==-99.0] = -3.
-        l2800 = 10**(((5*np.log10(cosmo.luminosity_distance(zp).value*1e5)+l2800)-25.)/(-2.5))
-        umag = 10**(((5*np.log10(cosmo.luminosity_distance(zp).value*1e5)+umag)-25.)/(-2.5))
-        vmag = 10**(((5*np.log10(cosmo.luminosity_distance(zp).value*1e5)+vmag)-25.)/(-2.5))
+        # l2800 = 10**(((5*np.log10(cosmo.luminosity_distance(zp).value*1e5)+l2800)-25.)/(-2.5))
+        # umag = 10**(((5*np.log10(cosmo.luminosity_distance(zp).value*1e5)+umag)-25.)/(-2.5))
+        # vmag = 10**(((5*np.log10(cosmo.luminosity_distance(zp).value*1e5)+vmag)-25.)/(-2.5))
 
         umag,vmag = np.loadtxt(directory+'/test_phot/OUTPUT/cosmos.153-155.rf', usecols=(5,6), unpack=True)
         l2800 = np.loadtxt(directory+'/test_phot/OUTPUT/cosmos.219-153.rf', usecols=(5,), unpack=True)
@@ -176,16 +176,16 @@ def stellarPopMaps(directory, path):
                 Hscale = normH[i]/1.
 
                 scalemass = np.sum(10**lm[i]*normIR)/np.sum(10**lm[i]*npix)
-                physvars[0, ny, nx] = np.log10(10**lm[i]*normIR/scalemass)
+                physvars[0, ny, nx] = lm[i]#np.log10(10**lm[i]*normIR/scalemass)
 #                 physvars[0, ny, nx] = np.log10(10**lm[i]*normNIR[idx]/nirscale)#-np.log10(npix)
                 physvars[1, ny, nx] = lsfr[i]
                 physvars[2, ny, nx] = 1./scalemass #np.log10(10**lm[i]*nirscale/scalemass) #sfrw_age(la[i], lsfr[i])#-np.log10(npix)
 
                 photvars[0, ny,nx] = l2800[i]
                 ufact = np.sum(umag[i]*normUV)/np.sum(umag[i]*npix)
-                photvars[1, ny,nx] = umag[i]*normUV/ufact#*(normu[idx]/ubinscale)#/npix *normUV/ufact#
+                photvars[1, ny,nx] = umag[i]#*normUV/ufact#*(normu[idx]/ubinscale)#/npix *normUV/ufact#
                 vfact = np.sum(vmag[i]*normV)/np.sum(vmag[i]*npix)
-                photvars[2, ny,nx] = vmag[i]*normV/vfact#*(normv[idx]/vbinscale)#/npix *normV/vfact#
+                photvars[2, ny,nx] = vmag[i]#*normV/vfact#*(normv[idx]/vbinscale)#/npix *normV/vfact#
 
         return [physvars, photvars, binmap, binshape]
 
