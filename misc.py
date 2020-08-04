@@ -244,8 +244,8 @@ def returnRGB(directory, offsetdata=False, fact=1, fixoffset=False):
         k = _return_offseted_data(offsetdata, 'ultravista_Ks', k)
 
     tmpdata = [b, z, k]
-    for tmpi, td in enumerate(tmpdata):
-        tmpdata[tmpi] = rescale(td, 260/156., mode='reflect')*(156/260.)**2
+    # for tmpi, td in enumerate(tmpdata):
+    #     tmpdata[tmpi] = rescale(td, 260/156., mode='reflect')*(156/260.)**2
 
     hscale = 1./(10**(-(-30+31.4)/-2.5))
     z *= hscale
