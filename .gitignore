@@ -1,5 +1,5 @@
 
-**/sedfiles/fast.param
+**/sedfiles/*.param
 
 **/__pycache__
 *.pyc
