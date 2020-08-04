@@ -145,7 +145,19 @@ def getnoisedis(directories, path, deconvOffset=False, offset=False):
     print (sig)
     # print (1/0.)
 
-    def _return_offseted_data(offsetsdata, filtname, data):
+    tmpcat = np.loadtxt('/mnt/drivea/run/cosmos/cosmos_sfgs.dat', skiprows=1, usecols=[i for i in np.arange(11,43)])
+    _ids = np.loadtxt('/mnt/drivea/run/cosmos/cosmos_sfgs.dat', skiprows=1, usecols=[0])
+    _ids = list(_ids)
+    snrs = 10**((tmpcat[:, ::2]-tmpcat[:, 1::2])/-2.5)
+    fluxes = 10**((tmpcat[:, ::2]-25)/-2.5)
+
+    def getSNR(_id, idx, fluxes):
+        fluxid = [1,2,3,4,13,6,12,7,11,15,10,8,14] # making sure to retrieve the right flux
+        fluxid = [8,14,15,10,11,12,13,7,6,4,1,2,0,3]
+        id_idx = _ids.index(_id)
+        return fluxes[id_idx, fluxid[idx]]
+
+    def _return_offseted_data(offsetsdata, filtname, data, dec=False):
 
         bands = ['subaru_IA427', 'subaru_B', 'subaru_IA484', 'subaru_IA505', 'subaru_IA527', 'subaru_V',\
          'subaru_IA624', 'subaru_rp', 'subaru_IA738', 'subaru_zp', 'ultravista_Y', 'ultravista_J', 'ultravista_H']
@@ -157,22 +169,26 @@ def getnoisedis(directories, path, deconvOffset=False, offset=False):
             dy = offsetsdata['dy'].data[idx_offset]
             dx = offsetsdata['dx'].data[idx_offset]
 
-        # print filtname, dy, dx
-        data = np.roll(data, int(dy*3), 0)
-        data = np.roll(data, int(dx*3), 1)
+        if dec:
+            data = np.roll(data, int(dy), 0)
+            data = np.roll(data, int(dx), 1)
+        else:
+            data = np.roll(data, int(dy*3), 0)
+            data = np.roll(data, int(dx*3), 1)
         # plt.imshow(data, origin='lower')
         # plt.show()
         return data
 
     warnings.simplefilter("error", RuntimeWarning)
     for d in tqdm(glob.glob('./{}/'.format(path)+directories)[:200]):
-        _id = os.path.basename(d).split('_')[1].split('-')[1]
+        _id = int(os.path.basename(d).split('_')[1].split('-')[1])
         # tile = d.split('/')[4][1:]
 
         hdu = fits.open('./{}/{}/watershed_segmaps/_id-{}.fits'.format(path, tile, _id))
         segmap = hdu[0].data
         hdu.close()
-        if deconvOffset: dec_offsets = ascii.read( './{}/offsets/_id-{}-dec.dat'.format(tile, int(_id)) )
+
+        if deconvOffset: dec_offsets = ascii.read( './{}/{}/offsets/_id-{}-dec.dat'.format(path, tile, int(_id)) )
         if offset: offsets = ascii.read( './{}/{}/offsets/_id-{}.dat'.format(path, tile, int(_id)) )
 
         for i, fdir in enumerate(sorted(glob.glob(d+'/*-*'))): #*.0
@@ -189,10 +205,20 @@ def getnoisedis(directories, path, deconvOffset=False, offset=False):
 
             hdu = fits.open(fdir+'/deconv_01.fits')
             data = hdu[0].data#*scaling
+            dec = data.copy()
             hdu.close()
-            data[segmap==0] = 0
-            if deconvOffset: data = _return_offseted_data(dec_offsets, filtname, data)
+
+            snr = getSNR(int(_id), i, fluxes)
+            apermask = misc.createCircularMask(156, 156, center=[156/2, 156/2], radius=21.)
+            masked_img = data.copy()
+            masked_img[~apermask] = 0
+            fact = float(diagnostics.search_cfg(fdir+'/config.py'.format(tile[1:]), 'IMG_FACT')[1:-1])
+            # print (snr/masked_img.sum()*masked_img.sum(), snr )
+
             if offset: data = _return_offseted_data(offsets, filtname, data)
+            if deconvOffset: data = _return_offseted_data(dec_offsets, filtname, data, dec=True)
+
+            data[segmap==0] = 0
             zeroidx = np.where(data.ravel()!=0)[0]
             # print np.min(data), np.max(data)
 
@@ -205,11 +231,10 @@ def getnoisedis(directories, path, deconvOffset=False, offset=False):
                 # if 'B' not in filtname: print ('aperture noise less than poison noise: '+filtname)
 
             y, x = np.indices(noise.shape)
-            savedata = np.c_[y.ravel()[zeroidx], x.ravel()[zeroidx], data.ravel()[zeroidx]*scaling, noise.ravel()[zeroidx]*scaling]#.T
+            savedata = np.c_[y.ravel()[zeroidx], x.ravel()[zeroidx], data.ravel()[zeroidx]*snr/masked_img.sum(), noise.ravel()[zeroidx]*snr/masked_img.sum()]#.T
 
-            if os.path.isfile(fdir+'/vorbin_input.txt.npy'):
-                os.remove(fdir+'/vorbin_input.txt.npy')
             # with open(fdir+'/vorbin_input.txt', 'w+') as datafile_id:
+            if os.path.isfile(fdir+'/vorbin_input.txt'): os.remove(fdir+'/vorbin_input.txt')
             np.savetxt(fdir+'/vorbin_input.txt', savedata) #savedata, fmt=['%f','%f', '%f','%f'])
 
 def create_cat(directories, path, constrain=False, bin_data=True):
