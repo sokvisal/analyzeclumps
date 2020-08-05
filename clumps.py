@@ -126,7 +126,7 @@ def stellarPopMaps(directory, path):
     weighted_chi2 = np.array(weighted_chi2)
 
     if np.nanmean(chi2)>5:
-        return False
+        return False, False
     else:
         lsfr[lsfr==-99.0] = -3.
         # l2800 = 10**(((5*np.log10(cosmo.luminosity_distance(zp).value*1e5)+l2800)-25.)/(-2.5))
