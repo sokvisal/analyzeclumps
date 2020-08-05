@@ -141,6 +141,7 @@ def stellarPopMaps(directory, path):
         vmag[vmag==-99.] = 1e-10
 
         binmap = np.ones((size,size))
+        tmpvars = np.zeros((1,size,size))*np.nan
         physvars = np.zeros((3,size,size))*np.nan
         photvars = np.zeros((3,size,size))*np.nan
 
@@ -176,18 +177,21 @@ def stellarPopMaps(directory, path):
                 Hscale = normH[i]/1.
 
                 scalemass = np.sum(10**lm[i]*normIR)/np.sum(10**lm[i]*npix)
-                physvars[0, ny, nx] = lm[i]#np.log10(10**lm[i]*normIR/scalemass)
-#                 physvars[0, ny, nx] = np.log10(10**lm[i]*normNIR[idx]/nirscale)#-np.log10(npix)
+                physvars[0, ny, nx] = np.log10(10**lm[i]*normIR/scalemass)
                 physvars[1, ny, nx] = lsfr[i]
                 physvars[2, ny, nx] = 1./scalemass #np.log10(10**lm[i]*nirscale/scalemass) #sfrw_age(la[i], lsfr[i])#-np.log10(npix)
 
+                tmpvars[0, ny, nx] = sNIR[idx]
+
                 photvars[0, ny,nx] = l2800[i]
                 ufact = np.sum(umag[i]*normUV)/np.sum(umag[i]*npix)
-                photvars[1, ny,nx] = umag[i]#*normUV/ufact#*(normu[idx]/ubinscale)#/npix *normUV/ufact#
+                photvars[1, ny,nx] = umag[i]*normUV/ufact#*(normu[idx]/ubinscale)#/npix *normUV/ufact#
                 vfact = np.sum(vmag[i]*normV)/np.sum(vmag[i]*npix)
-                photvars[2, ny,nx] = vmag[i]#*normV/vfact#*(normv[idx]/vbinscale)#/npix *normV/vfact#
+                photvars[2, ny,nx] = vmag[i]*normV/vfact#*(normv[idx]/vbinscale)#/npix *normV/vfact#
 
-        return [physvars, photvars, binmap, binshape]
+        tmpvars[0][np.isnan(tmpvars[0])] = 0.
+        tmpy, tmpx = np.unravel_index(np.argmax(tmpvars[0]), tmpvars[0].shape)
+        return [physvars, photvars, binmap, binshape], [tmpy, tmpx]
 
 def retrieved_maps(directories, path):
 
@@ -219,7 +223,7 @@ def retrieved_maps(directories, path):
             offsets = ascii.read('./{}/a{}/offsets/_id-{}.dat'.format(path, tile, idnum) )
             rgbimg = misc.returnRGB(d, offsets)
 
-            boolcheck = stellarPopMaps(d, path)
+            boolcheck, coords = stellarPopMaps(d, path)
             if type(boolcheck) == type(True):
                 badcounts += 1
             else:
@@ -229,7 +233,7 @@ def retrieved_maps(directories, path):
                 physvars *= segmap
                 photvars *= segmap
                 mass, params, normmaps, diagnostics, outerflux =\
-                                structparams.setup_profile([tmpyc, tmpxc], a, b, phi, physvars, photvars, zp)
+                                structparams.setup_profile(coords, a, b, phi, physvars, photvars, zp)
 
                 maps = [physvars[0], physvars[1], photvars[1], photvars[2], -2.5*np.log10(photvars[1]/photvars[2]), binmap]
                 galmass_idl, galmass_c, galsfr, hmag, bmag, zmag, umv = getMSFR(idnum)
