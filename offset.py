@@ -146,8 +146,8 @@ def get_offsets(catdir, catname, tile, path):
             offsetcoords.append([dy,dx])
             offsetcoords_dec.append([dy_dec,dx_dec])
         if _id in [181078, 181952, 183184, 189746, 185187, 187119]:
-            print _id
-            print np.array(offsetcoords)*3 + np.array(offsetcoords_dec)
+            print (_id)
+            print (np.array(offsetcoords)*3 + np.array(offsetcoords_dec))
 
         # if skipdata:
         #     shutil.move(_dir, _dir.replace(filename, 'badphot/{}'.format(filename)))
