@@ -51,7 +51,7 @@ def get_offsets(catdir, catname, tile, path):
     bands = ['subaru-IA427', 'subaru-B', 'subaru-IA484', 'subaru-IA505', 'subaru-IA527', 'subaru-V', 'subaru-IA624',\
              'subaru-rp', 'subaru-IA738', 'subaru-zp', 'ultravista-Y', 'ultravista-J', 'ultravista-H']
 
-    for dirname in tqdm(glob.glob('./{}/a{}/_id*'.format(path, tile))[:200]):
+    for dirname in tqdm(glob.glob('./{}/a{}/_id*'.format(path, tile))[:]):
         # print (dirname)
         _id = int(os.path.basename(dirname).split('-')[1].split('_')[0])
         idx = _ids.index(_id)
@@ -89,7 +89,6 @@ def get_offsets(catdir, catname, tile, path):
             if snr < 5:
                 dy = 0.0
                 dx = 0.0
-                matchimg = tmpimg
             else:
                 correlation = correlate(tmpimg, matchimg, mode='same', method='fft')
                 tmpy, tmpx = np.unravel_index(np.argmax(correlation), correlation.shape)
@@ -107,15 +106,14 @@ def get_offsets(catdir, catname, tile, path):
 
             tmpimg = np.roll(tmpimg, int(dy), 0)
             tmpimg = np.roll(tmpimg, int(dx), 1)
-            matchimg = tmpimg
-            tmplist.append(matchimg)
+            if band in ['H', 'Y', 'J', 'zp', 'rp', 'V', 'B', 'Ks']:
+                matchimg = tmpimg
 
             tmpdec = np.roll(tmpdec, 3*int(dy), 0)
             tmpdec = np.roll(tmpdec, 3*int(dx), 1)
             if snr < 5:
                 dy = 0.0
                 dx = 0.0
-                matchimg = tmpimg
             else:
                 correlation = correlate(tmpdec, matchdec, mode='same', method='fft')
                 tmpy, tmpx = np.unravel_index(np.argmax(correlation*segmap), correlation.shape)
@@ -126,7 +124,8 @@ def get_offsets(catdir, catname, tile, path):
                 # print (band, dy_dec, dx_dec, dirname)
             tmpdec = np.roll(tmpdec, int(dy_dec), 0)
             tmpdec = np.roll(tmpdec, int(dx_dec), 1)
-            matchdec = tmpdec
+            if band in ['H', 'Y', 'J', 'zp', 'rp', 'V', 'B', 'Ks']:
+                matchdec = tmpdec
 
 
             if snr > 5 and np.sqrt(dy**2 + dx**2) > 5:
@@ -145,22 +144,22 @@ def get_offsets(catdir, catname, tile, path):
                 print ('####################')
             offsetcoords.append([dy,dx])
             offsetcoords_dec.append([dy_dec,dx_dec])
-        if _id in [181078, 181952, 183184, 189746, 185187, 187119]:
-            print (_id)
-            print (np.array(offsetcoords)*3 + np.array(offsetcoords_dec))
+        # if _id in [181078, 181952, 183184, 189746, 185187, 187119]:
+        #     print (_id)
+        #     print (np.array(offsetcoords)*3 + np.array(offsetcoords_dec))
 
-        # if skipdata:
-        #     shutil.move(_dir, _dir.replace(filename, 'badphot/{}'.format(filename)))
-        # else:
-        #     offsetcoords = np.array(offsetcoords)
-        #     offsetTab = Table([offsetcoords[:,i] for i in range(2)], names=('dy', 'dx'), meta={'name': 'offset in pixels'})
-        #     ascii.write(offsetTab, './{}/a{}/offsets/_id-{}.dat'.format(path, tile, int(_id)),\
-        #                 overwrite=True, format='commented_header')
-        #
-        #     offsetcoords_dec = np.array(offsetcoords_dec)
-        #     offsetTab = Table([offsetcoords_dec[:,i] for i in range(2)], names=('dy', 'dx'), meta={'name': 'offset in pixels (deconvolved)'})
-        #     ascii.write(offsetTab, './{}/a{}/offsets/_id-{}-dec.dat'.format(path, tile, int(_id)),\
-        #                 overwrite=True, format='commented_header')
+        if skipdata:
+            shutil.move(_dir, _dir.replace(filename, 'badphot/{}'.format(filename)))
+        else:
+            offsetcoords = np.array(offsetcoords)
+            offsetTab = Table([offsetcoords[:,i] for i in range(2)], names=('dy', 'dx'), meta={'name': 'offset in pixels'})
+            ascii.write(offsetTab, './{}/a{}/offsets/_id-{}.dat'.format(path, tile, int(_id)),\
+                        overwrite=True, format='commented_header')
+
+            offsetcoords_dec = np.array(offsetcoords_dec)
+            offsetTab = Table([offsetcoords_dec[:,i] for i in range(2)], names=('dy', 'dx'), meta={'name': 'offset in pixels (deconvolved)'})
+            ascii.write(offsetTab, './{}/a{}/offsets/_id-{}-dec.dat'.format(path, tile, int(_id)),\
+                        overwrite=True, format='commented_header')
 
 def return_offsets(catdir, catname, tile, path):
 
