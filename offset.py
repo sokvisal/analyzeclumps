@@ -106,7 +106,7 @@ def get_offsets(catdir, catname, tile, path):
 
             tmpimg = np.roll(tmpimg, int(dy), 0)
             tmpimg = np.roll(tmpimg, int(dx), 1)
-            if band.split('-')[1] in ['Y', 'zp', 'rp', 'V', 'B']:#['H', 'Y', 'J', 'zp', 'rp', 'V', 'B', 'Ks']:
+            if band.split('-')[1] in ['Y', 'IA738', 'zp', 'rp', 'V', 'B']:#['H', 'Y', 'J', 'zp', 'rp', 'V', 'B', 'Ks']:
                 matchimg = tmpimg
                 # print (band, dy, dx, dirname)
                 # tmplist.append(matchimg)
@@ -136,7 +136,6 @@ def get_offsets(catdir, catname, tile, path):
                 plt.imshow(tmpimg, origin='lower')
                 plt.subplot(132)
                 plt.imshow(matchimg, origin='lower')
-                print (tmplist.shape[0])
                 plt.subplot(133)
                 plt.imshow(tmplist[-1], origin='lower')
                 plt.show()
