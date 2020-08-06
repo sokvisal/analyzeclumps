@@ -106,8 +106,10 @@ def get_offsets(catdir, catname, tile, path):
 
             tmpimg = np.roll(tmpimg, int(dy), 0)
             tmpimg = np.roll(tmpimg, int(dx), 1)
-            if band in ['H', 'Y', 'J', 'zp', 'rp', 'V', 'B', 'Ks']:
+            if band.split('-')[1] in ['Y', 'zp', 'rp', 'V', 'B']:#['H', 'Y', 'J', 'zp', 'rp', 'V', 'B', 'Ks']:
                 matchimg = tmpimg
+                # print (band, dy, dx, dirname)
+                # tmplist.append(matchimg)
 
             tmpdec = np.roll(tmpdec, 3*int(dy), 0)
             tmpdec = np.roll(tmpdec, 3*int(dx), 1)
@@ -115,18 +117,16 @@ def get_offsets(catdir, catname, tile, path):
                 dy = 0.0
                 dx = 0.0
             else:
-                correlation = correlate(tmpdec, matchdec, mode='same', method='fft')
-                tmpy, tmpx = np.unravel_index(np.argmax(correlation*segmap), correlation.shape)
+                correlation = correlate(tmpdec*segmap, matchdec*segmap, mode='same', method='fft')
+                tmpy, tmpx = np.unravel_index(np.argmax(correlation), correlation.shape)
 
                 dy_dec = (correlation.shape[0]/2.-tmpy)
                 dx_dec = (correlation.shape[0]/2.-tmpx)
 
-                # print (band, dy_dec, dx_dec, dirname)
             tmpdec = np.roll(tmpdec, int(dy_dec), 0)
             tmpdec = np.roll(tmpdec, int(dx_dec), 1)
-            if band in ['H', 'Y', 'J', 'zp', 'rp', 'V', 'B', 'Ks']:
+            if band.split('-')[1] in ['Y', 'zp', 'rp', 'V', 'B']:
                 matchdec = tmpdec
-
 
             if snr > 5 and np.sqrt(dy**2 + dx**2) > 5:
                 print ('####################')
@@ -136,8 +136,9 @@ def get_offsets(catdir, catname, tile, path):
                 plt.imshow(tmpimg, origin='lower')
                 plt.subplot(132)
                 plt.imshow(matchimg, origin='lower')
+                print (tmplist.shape[0])
                 plt.subplot(133)
-                plt.imshow(tmplist[j-1], origin='lower')
+                plt.imshow(tmplist[-1], origin='lower')
                 plt.show()
                 plt.close()
                 print ('####################')
