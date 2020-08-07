@@ -232,10 +232,10 @@ def retrieved_maps(directories, path):
 
                 physvars *= segmap
                 photvars *= segmap
-                # mass, params, normmaps, diagnostics, outerflux =\
-                #                 structparams.setup_profile([tmpyc, tmpxc], a, b, phi, physvars, photvars, zp)
                 mass, params, normmaps, diagnostics, outerflux =\
-                                structparams.setup_profile_old(physvars, photvars, zp, phi)
+                                structparams.setup_profile([tmpyc, tmpxc], a, b, phi, physvars, photvars, zp)
+                # mass, params, normmaps, diagnostics, outerflux =\
+                #                 structparams.setup_profile_old(physvars, photvars, zp, phi)
 
                 maps = [physvars[0], physvars[1], photvars[1], photvars[2], -2.5*np.log10(photvars[1]/photvars[2]), binmap]
                 galmass_idl, galmass_c, galsfr, hmag, bmag, zmag, umv = getMSFR(idnum)
