@@ -9,6 +9,7 @@ def fit(path, tile):
     print ('Starting queue')
     wdir = os.getcwd()
 
+    script_dir = '/hpcstorage/sok/run/cosmos/analyzeclumps'
     for i in tqdm(directories[:200]):
 
         if os.path.isdir(i+'/test_phot'):
