@@ -97,19 +97,16 @@ def get_offsets(catdir, catname, tile, path):
                 dy = correlation.shape[0]/2.-tmpy
                 dx = correlation.shape[0]/2.-tmpx
 
-                if snr > 5 and np.sqrt(dy**2 + dx**2) > 3:
-                    correlation = correlate(tmpimg*segmap_coarse, matchimg*segmap_coarse, mode='same', method='fft')
-                    tmpy, tmpx = np.unravel_index(np.argmax(correlation*segmap_coarse), correlation.shape)
-
-                    dy = (correlation.shape[0]/2.-tmpy)
-                    dx = (correlation.shape[0]/2.-tmpx)
-
             tmpimg = np.roll(tmpimg, int(dy), 0)
             tmpimg = np.roll(tmpimg, int(dx), 1)
-            if band.split('-')[1] in ['Y', 'IA738', 'zp', 'rp', 'V', 'B']:#['H', 'Y', 'J', 'zp', 'rp', 'V', 'B', 'Ks']:
-                matchimg = tmpimg
+            # tmplist.append(matchimg)
+
+            # if band.split('-')[1] in ['Y', 'IA738', 'zp', 'rp', 'V', 'B']:#['H', 'Y', 'J', 'zp', 'rp', 'V', 'B', 'Ks']:
+            matchimg = tmpimg
                 # print (band, dy, dx, dirname)
-                # tmplist.append(matchimg)
+
+            # plt.imshow(tmpimg*segmap_coarse)
+            # plt.show()
 
             tmpdec = np.roll(tmpdec, 3*int(dy), 0)
             tmpdec = np.roll(tmpdec, 3*int(dx), 1)
