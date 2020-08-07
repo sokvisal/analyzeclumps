@@ -177,7 +177,7 @@ def stellarPopMaps(directory, path):
                 Hscale = normH[i]/1.
 
                 scalemass = np.sum(10**lm[i]*normIR)/np.sum(10**lm[i]*npix)
-                physvars[0, ny, nx] = np.log10(10**lm[i]*normIR/scalemass)
+                physvars[0, ny, nx] = lm[i]#np.log10(10**lm[i]*normIR/scalemass)
                 physvars[1, ny, nx] = lsfr[i]
                 physvars[2, ny, nx] = 1./scalemass #np.log10(10**lm[i]*nirscale/scalemass) #sfrw_age(la[i], lsfr[i])#-np.log10(npix)
 
@@ -185,9 +185,9 @@ def stellarPopMaps(directory, path):
 
                 photvars[0, ny,nx] = l2800[i]
                 ufact = np.sum(umag[i]*normUV)/np.sum(umag[i]*npix)
-                photvars[1, ny,nx] = umag[i]*normUV/ufact#*(normu[idx]/ubinscale)#/npix *normUV/ufact#
+                photvars[1, ny,nx] = umag[i]#*normUV/ufact#*(normu[idx]/ubinscale)#/npix *normUV/ufact#
                 vfact = np.sum(vmag[i]*normV)/np.sum(vmag[i]*npix)
-                photvars[2, ny,nx] = vmag[i]*normV/vfact#*(normv[idx]/vbinscale)#/npix *normV/vfact#
+                photvars[2, ny,nx] = vmag[i]#*normV/vfact#*(normv[idx]/vbinscale)#/npix *normV/vfact#
 
         tmpvars[0][np.isnan(tmpvars[0])] = 0.
         tmpy, tmpx = np.unravel_index(np.argmax(tmpvars[0]), tmpvars[0].shape)
