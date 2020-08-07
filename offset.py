@@ -51,7 +51,7 @@ def get_offsets(catdir, catname, tile, path):
     bands = ['subaru-IA427', 'subaru-B', 'subaru-IA484', 'subaru-IA505', 'subaru-IA527', 'subaru-V', 'subaru-IA624',\
              'subaru-rp', 'subaru-IA738', 'subaru-zp', 'ultravista-Y', 'ultravista-J', 'ultravista-H']
 
-    for dirname in tqdm(glob.glob('./{}/a{}/_id*'.format(path, tile))[73:74]):
+    for dirname in tqdm(glob.glob('./{}/a{}/_id*'.format(path, tile))[:]):
         # print (dirname)
         _id = int(os.path.basename(dirname).split('-')[1].split('_')[0])
         idx = _ids.index(_id)
