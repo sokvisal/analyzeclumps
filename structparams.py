@@ -335,10 +335,10 @@ def setup_profile_old(prop, phot_vars, zphot, phi):
         cint = c/4
 
         y, x = np.indices(mass.shape)
-        y = y[c-cint:c+cint, c-cint:c+cint]
-        x = x[c-cint:c+cint, c-cint:c+cint]
+        y = y[int(c-cint):int(c+cint), int(c-cint):int(c+cint)]
+        x = x[int(c-cint):int(c+cint), int(c-cint):int(c+cint)]
 
-        m = 10**mass[c-cint:c+cint, c-cint:c+cint].ravel()
+        m = 10**mass[int(c-cint):int(c+cint), int(c-cint):int(c+cint)].ravel()
         mcentral = 10**mass.ravel()
         idx = np.argwhere(~np.isnan(m))
 
@@ -479,8 +479,6 @@ def setup_profile_old(prop, phot_vars, zphot, phi):
             ells.append(Ell_rot)
         return ells
 
-    from photutils import EllipticalAperture
-    from photutils import aperture_photometry
     import copy
 
     sm_unmask = copy.deepcopy(stellar_mass)
