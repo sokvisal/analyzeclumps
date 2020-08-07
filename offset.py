@@ -51,7 +51,7 @@ def get_offsets(catdir, catname, tile, path):
     bands = ['subaru-IA427', 'subaru-B', 'subaru-IA484', 'subaru-IA505', 'subaru-IA527', 'subaru-V', 'subaru-IA624',\
              'subaru-rp', 'subaru-IA738', 'subaru-zp', 'ultravista-Y', 'ultravista-J', 'ultravista-H']
 
-    for dirname in tqdm(glob.glob('./{}/a{}/_id*'.format(path, tile))[:]):
+    for dirname in tqdm(glob.glob('./{}/a{}/_id*'.format(path, tile))[73:74]):
         # print (dirname)
         _id = int(os.path.basename(dirname).split('-')[1].split('_')[0])
         idx = _ids.index(_id)
@@ -97,6 +97,10 @@ def get_offsets(catdir, catname, tile, path):
                 dy = correlation.shape[0]/2.-tmpy
                 dx = correlation.shape[0]/2.-tmpx
 
+                if snr > 5 and np.sqrt(dy**2 + dx**2) > 5:
+                    dy = 0.0
+                    dx = 0.0
+
             tmpimg = np.roll(tmpimg, int(dy), 0)
             tmpimg = np.roll(tmpimg, int(dx), 1)
             # tmplist.append(matchimg)
@@ -105,7 +109,7 @@ def get_offsets(catdir, catname, tile, path):
             matchimg = tmpimg
                 # print (band, dy, dx, dirname)
 
-            # plt.imshow(tmpimg*segmap_coarse)
+            # plt.imshow(tmpimg)
             # plt.show()
 
             tmpdec = np.roll(tmpdec, 3*int(dy), 0)
@@ -124,6 +128,7 @@ def get_offsets(catdir, catname, tile, path):
             tmpdec = np.roll(tmpdec, int(dx_dec), 1)
             if band.split('-')[1] in ['Y', 'zp', 'rp', 'V', 'B']:
                 matchdec = tmpdec
+                # print (band, dy_dec, dx_dec, dirname)
 
             if snr > 5 and np.sqrt(dy**2 + dx**2) > 5:
                 print ('####################')
