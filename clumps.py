@@ -231,10 +231,10 @@ def retrieved_maps(directories, path):
 
                 physvars *= segmap
                 photvars *= segmap
-                mass, params, normmaps, diagnostics, outerflux =\
-                                structparams.setup_profile([tmpyc, tmpxc], a, b, phi, physvars, photvars, zp)
                 # mass, params, normmaps, diagnostics, outerflux =\
-                #                 structparams.setup_profile_old(physvars, photvars, zp, phi)
+                #                 structparams.setup_profile([tmpyc, tmpxc], a, b, phi, physvars, photvars, zp)
+                mass, params, normmaps, diagnostics, res = old_normporfiles.coadd_profile(phys_vars, phot_vars, zp)
+
 
                 maps = [physvars[0], physvars[1], photvars[1], photvars[2], -2.5*np.log10(photvars[1]/photvars[2]), binmap]
                 galmass_idl, galmass_c, galsfr, hmag, bmag, zmag, umv = getMSFR(idnum)
@@ -244,9 +244,11 @@ def retrieved_maps(directories, path):
 
                 # 'radial_profiles'
                 # plotting the co-added normalized profile
-                fig, clumpids, ccs, agew_rnorm = normprofiles.make_profile(rgbimg, maps, normmaps,\
-                                params, [zp, idnum], tile, outerflux, res=[None, None, None, None],\
-                                                                           savedir=False, showplot=False)
+                # fig, clumpids, ccs, agew_rnorm = normprofiles.make_profile(rgbimg, maps, normmaps,\
+                #                 params, [zp, idnum], tile, outerflux, res=[None, None, None, None],\
+                #                                                            savedir=False, showplot=False)
+                fig, clumpids, clumpiness, ccs = old_normporfiles.caddnorm_plot(rgbimg, maps, normmaps, params, idnum, res)
+
 
                 newcat_clumps.append([idnum, zp,  galmass_idl, mass, galsfr] + clumpids + ccs + diagnostics)
 

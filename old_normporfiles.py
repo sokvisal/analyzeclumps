@@ -204,6 +204,7 @@ def caddnorm_plot(rgb_img, maps, normmaps, params, titleid, res): # yi, xi, norm
             clumpyid[i] = 2
 
 
+    cc_sm = clumps_contribution(uNorm[0], uNorm[1], sm, clumpmap_u_r)
     cc_sfr = clumps_contribution(uNorm[0], uNorm[1], sfr, clumpmap_u_r)
     # print 'Clump contribution in mass:, ', clumps_contribution(uNorm[0], uNorm[1], sm, clumpmap_u_r)
     # print 'Clump contribution in sfr:, ', cc_sfr
@@ -212,7 +213,7 @@ def caddnorm_plot(rgb_img, maps, normmaps, params, titleid, res): # yi, xi, norm
     # print np.sum(uravel[clumpmap_u_r==3])/np.sum(uravel)
     # print np.sum(vravel[clumpmap_v_r==3])/np.sum(vravel)
 
-    return fig, clumpyid, [clumpiness]
+    return fig, clumpyid, [clumpiness], [cc_sm, cc_sfr]
 
 def clumps_contribution(yarray, xarray, map, clumps_map):
     # coords = zip(yarray, xarray)
