@@ -129,16 +129,15 @@ def stellarPopMaps(directory, path):
         return False, False
     else:
         lsfr[lsfr==-99.0] = -3.
-        # l2800 = 10**(((5*np.log10(cosmo.luminosity_distance(zp).value*1e5)+l2800)-25.)/(-2.5))
-        # umag = 10**(((5*np.log10(cosmo.luminosity_distance(zp).value*1e5)+umag)-25.)/(-2.5))
-        # vmag = 10**(((5*np.log10(cosmo.luminosity_distance(zp).value*1e5)+vmag)-25.)/(-2.5))
+        l2800 = 10**(((5*np.log10(cosmo.luminosity_distance(zp).value*1e5)+l2800)-25.)/(-2.5))
+        umag = 10**(((5*np.log10(cosmo.luminosity_distance(zp).value*1e5)+umag)-25.)/(-2.5))
+        vmag = 10**(((5*np.log10(cosmo.luminosity_distance(zp).value*1e5)+vmag)-25.)/(-2.5))
 
-        umag,vmag = np.loadtxt(directory+'/test_phot/OUTPUT/cosmos.153-155.rf', usecols=(5,6), unpack=True)
-        l2800 = np.loadtxt(directory+'/test_phot/OUTPUT/cosmos.219-153.rf', usecols=(5,), unpack=True)
-
-        l2800[l2800==-99.] = 1e-10
-        umag[umag==-99.] = 1e-10
-        vmag[vmag==-99.] = 1e-10
+        # umag,vmag = np.loadtxt(directory+'/test_phot/OUTPUT/cosmos.153-155.rf', usecols=(5,6), unpack=True)
+        # l2800 = np.loadtxt(directory+'/test_phot/OUTPUT/cosmos.219-153.rf', usecols=(5,), unpack=True)
+        # l2800[l2800==-99.] = 1e-10
+        # umag[umag==-99.] = 1e-10
+        # vmag[vmag==-99.] = 1e-10
 
         binmap = np.ones((size,size))
         tmpvars = np.zeros((1,size,size))*np.nan
