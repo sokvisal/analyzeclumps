@@ -272,8 +272,11 @@ def createCat(decpath, tile):
     ids_clumps = np.array(ids_clumps)
 
     from astropy.table import Table
-    ids_clumps_cat = Table([ids_clumps[:,i] for i in range(18)],\
-                           names=('id', 'z', 'lm', 'lm_res', 'lsfr', 'mclump', 'fuclump', 'uclump', 'vclump',\
-                                  'mfrac', 'fufrac', 'ufrac', 'vfrac', 'cc_sm', 'cc_sfr', 'cm_density', 'issfr', 'ossfr'),\
+    # ids_clumps_cat = Table([ids_clumps[:,i] for i in range(18)],\
+    #                        names=('id', 'z', 'lm', 'lm_res', 'lsfr', 'mclump', 'fuclump', 'uclump', 'vclump',\
+    #                               'mfrac', 'fufrac', 'ufrac', 'vfrac', 'cc_sm', 'cc_sfr', 'cm_density', 'issfr', 'ossfr'),\
+    #                                meta={'name': 'cosmos clump id'})
+    ids_clumps_cat = Table([ids_clumps[:,i] for i in range(14)],\
+                           names=('id', 'z', 'lm', 'lm_res', 'lsfr', 'mclump', 'fuclump', 'uclump', 'vclump', 'cc_sm', 'cc_sfr', 'cm_density', 'issfr', 'ossfr'),\
                                    meta={'name': 'cosmos clump id'})
     ascii.write(ids_clumps_cat, '{}/clumps-catalog.dat'.format(dirname[:-5]), overwrite=True, format='commented_header')
