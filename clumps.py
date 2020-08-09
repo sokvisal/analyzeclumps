@@ -234,7 +234,7 @@ def retrieved_maps(directories, path):
                 photvars *= segmap
                 # mass, params, normmaps, diagnostics, outerflux =\
                 #                 structparams.setup_profile([tmpyc, tmpxc], a, b, phi, physvars, photvars, zp)
-                mass, params, normmaps, diagnostics, res = old_normporfiles.coadd_profile(phys_vars, phot_vars, zp)
+                mass, params, normmaps, diagnostics, res = old_normporfiles.coadd_profile(physvars, photvars, zp)
 
 
                 maps = [physvars[0], physvars[1], photvars[1], photvars[2], -2.5*np.log10(photvars[1]/photvars[2]), binmap]
