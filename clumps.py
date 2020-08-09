@@ -18,7 +18,7 @@ from astropy.io import fits
 
 import structparams
 import normprofiles
-import old_normprofiles
+import old_normporfiles
 import misc
 
 
