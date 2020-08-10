@@ -190,11 +190,11 @@ def returnRGB(directory, offsetdata=False, fact=1, fixoffset=False):
             dy, dx = [0,0]
         else:
             idx_offset = bands[::-1].index(filtname)
-            dy = offsetsdata['dy'].data[idx_offset]
-            dx = offsetsdata['dx'].data[idx_offset]
+            dy = offsetsdata[0][idx_offset]
+            dx = offsetsdata[1][idx_offset]
 
-        data = np.roll(data, int(dy*3), 0)
-        data = np.roll(data, int(dx*3), 1)
+        data = np.roll(data, int(dy), 0)
+        data = np.roll(data, int(dx), 1)
         return data
 
     from skimage.transform import rescale
@@ -211,14 +211,15 @@ def returnRGB(directory, offsetdata=False, fact=1, fixoffset=False):
 
         correctedimgs.append(matchimg)
         for i, tmpimg in enumerate(ndarray[1:]):
-            correlation = correlate(tmpimg, matchimg, method='fft')
+            correlation = correlate(tmpimg, matchimg, mode='same', method='fft')
             tmpy, tmpx = np.unravel_index(np.argmax(correlation), correlation.shape)
 
             dy = correlation.shape[0]/2-tmpy
             dx = correlation.shape[0]/2-tmpx
 
-            tmpimg = np.roll(tmpimg, dy, 0)
-            tmpimg = np.roll(tmpimg, dx, 1)
+            tmpimg = np.roll(tmpimg, int(dy), 0)
+            tmpimg = np.roll(tmpimg, int(dx), 1)
+            print (dy, dx)
 
             correctedimgs.append(tmpimg)
             matchimg = tmpimg
@@ -241,7 +242,7 @@ def returnRGB(directory, offsetdata=False, fact=1, fixoffset=False):
     if offsetdata:
         b = _return_offseted_data(offsetdata, 'subaru_V', b)
         z = _return_offseted_data(offsetdata, 'subaru_zp', z)
-        k = _return_offseted_data(offsetdata, 'ultravista_Ks', k)
+        k = _return_offseted_data(offsetdata, 'ultravista_H', k)
 
     tmpdata = [b, z, k]
     # for tmpi, td in enumerate(tmpdata):

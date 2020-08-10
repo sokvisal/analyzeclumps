@@ -92,7 +92,6 @@ def get_offsets(catdir, catname, tile, path):
             else:
                 correlation = correlate(tmpimg, matchimg, mode='same', method='fft')
                 tmpy, tmpx = np.unravel_index(np.argmax(correlation), correlation.shape)
-                # maxy, maxx = np.unravel_index(np.argmax(tmpimg*segmap), tmpimg.shape)\
 
                 dy = correlation.shape[0]/2.-tmpy
                 dx = correlation.shape[0]/2.-tmpx
@@ -115,8 +114,8 @@ def get_offsets(catdir, catname, tile, path):
             tmpdec = np.roll(tmpdec, 3*int(dy), 0)
             tmpdec = np.roll(tmpdec, 3*int(dx), 1)
             if snr < 5:
-                dy = 0.0
-                dx = 0.0
+                dy_dec = 0.0
+                dx_dec = 0.0
             else:
                 correlation = correlate(tmpdec*segmap, matchdec*segmap, mode='same', method='fft')
                 tmpy, tmpx = np.unravel_index(np.argmax(correlation), correlation.shape)
@@ -124,10 +123,10 @@ def get_offsets(catdir, catname, tile, path):
                 dy_dec = (correlation.shape[0]/2.-tmpy)
                 dx_dec = (correlation.shape[0]/2.-tmpx)
 
-            tmpdec = np.roll(tmpdec, int(dy_dec), 0)
-            tmpdec = np.roll(tmpdec, int(dx_dec), 1)
-            # if band.split('-')[1] in ['Y', 'zp', 'rp', 'V', 'B']:
-            matchdec = tmpdec
+                tmpdec = np.roll(tmpdec, int(dy_dec), 0)
+                tmpdec = np.roll(tmpdec, int(dx_dec), 1)
+            if band.split('-')[1] in ['H', 'Y', 'J', 'zp', 'rp', 'V', 'B']:
+                matchdec = tmpdec
                 # print (band, dy_dec, dx_dec, dirname)
 
             if snr > 5 and np.sqrt(dy**2 + dx**2) > 5:
