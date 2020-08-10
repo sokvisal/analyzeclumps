@@ -106,9 +106,6 @@ def stellarPopMaps(directory, path):
     y, x, sNIR, noise = np.loadtxt(directory+'/ultravista-H/vorbin_input.txt').T
 
     binNum = np.loadtxt(directory+'/vorbin_output.txt')
-
-    offsets = ascii.read('./{}/a{}/offsets/_id-{}.dat'.format(path, tile, idnum) )
-    rgbimg = misc.returnRGB(directory, offsets)
     size = 156
 
     binids, la, lm, lsfr, umag, vmag, l2800, chi2 = np.loadtxt(directory+'/test_phot/cosmos.fout', usecols=(0,4,6,7,10,11,12,13), unpack=True)
@@ -221,7 +218,10 @@ def retrieved_maps(directories, path):
             segmap = fits.open('./{}/a{}/watershed_segmaps/_id-{}.fits'.format(path, tile, idnum))[0].data
             segmap[segmap==0] = np.nan
             offsets = ascii.read('./{}/a{}/offsets/_id-{}.dat'.format(path, tile, idnum) )
-            rgbimg = misc.returnRGB(d, offsets)
+            decoffsets = ascii.read('./{}/a{}/offsets/_id-{}-dec.dat'.format(path, tile, idnum) )
+            dys = offsets['dy'].data*3+decoffsets['dy'].data
+            dxs = offsets['dx'].data*3+decoffsets['dx'].data
+            rgbimg = misc.returnRGB(d, offsetdata=[dys, dxs], fixoffset=False)
 
             boolcheck, coords = stellarPopMaps(d, path)
             if type(boolcheck) == type(True):
