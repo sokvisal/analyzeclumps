@@ -180,7 +180,7 @@ def getnoisedis(directories, path, catpath, deconvOffset=False, offset=False):
         return data
 
     warnings.simplefilter("error", RuntimeWarning)
-    for d in tqdm(glob.glob('./{}/'.format(path)+directories)[:200]):
+    for d in tqdm(glob.glob('./{}/'.format(path)+directories)[:]):
         _id = int(os.path.basename(d).split('_')[1].split('-')[1])
         # tile = d.split('/')[4][1:]
 
@@ -463,7 +463,7 @@ def create_cat(directories, path, constrain=False, bin_data=True):
     # print 1/0.
     _dirs = [idnames for idnames in glob.glob('./{}/'.format(path)+directories) if len(glob.glob(idnames+'/*-*'))==14]
     # print _dirs
-    for d in tqdm(_dirs[:200]):
+    for d in tqdm(_dirs[:]):
         phot_param = vbin(d) # if voronoi binning
         _save_cat(d, '/cosmos.cat', phot_param)
 
