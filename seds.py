@@ -10,7 +10,7 @@ def fit(path, tile):
     wdir = os.getcwd()
 
     script_dir = '/hpcstorage/sok/run/cosmos/analyzeclumps'
-    for i in tqdm(directories[:200]):
+    for i in tqdm(directories[50:]):
 
         if os.path.isdir(i+'/test_phot'):
             for dir in glob.glob('../analyzeclumps/sedfiles/*.param'):
