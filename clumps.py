@@ -247,7 +247,7 @@ def retrieved_maps(directories, path):
                 # # plotting the co-added normalized profile
                 fig, clumpids, ccs, agew_rnorm = normprofiles.make_profile(rgbimg, maps, normmaps,\
                                 params, [zp, idnum], tile, outerflux, res=[None, None, None, None],\
-                                                                           savedir='plots/{}'.format(tile), showplot=False)
+                                                                           savedir='{}/plots/{}'.format(path, tile), showplot=True)
                 # fig, clumpids, clumpiness, ccs = old_normporfiles.caddnorm_plot(rgbimg, maps, normmaps, params, idnum, res)
 
 
