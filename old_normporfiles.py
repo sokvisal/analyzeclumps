@@ -120,6 +120,7 @@ def caddnorm_plot(rgb_img, maps, normmaps, params, titleparams, res): # yi, xi, 
     ncol = 4
     plt.rcParams.update({'font.size':6})
     fig = plt.figure(figsize=((ncol+1)*2.*3.4/4., (nrow+1)*2.))
+    plt.show()
     #
     # from misc import rainbowb
     # from matplotlib import gridspec
@@ -581,8 +582,8 @@ def coadd_profile(prop, phot_vars, zphot):
             plt.show()
 
 #         theta = g_fit.mean.value
-        # return np.deg2rad(tmax), a, b
-        return np.deg2rad(mode(theta.ravel().astype(int))[0][0]), max(r.ravel()), mode(r.ravel().astype(int))[0][0]
+        return np.deg2rad(tmax), a, b
+        # return np.deg2rad(mode(theta.ravel().astype(int))[0][0]), max(r.ravel()), mode(r.ravel().astype(int))[0][0]
 
     def ellipses(a, b, to):
         # to = np.deg2rad(to)
@@ -611,7 +612,7 @@ def coadd_profile(prop, phot_vars, zphot):
     to, a, b = galparams(stellar_mass)
     e = b/a
     # e = np.sqrt(1-b**2/a**2)
-    # e = mwb/mwa
+    e = mwb/mwa
 #     print 'gal params: ', to, mwb, mwa
 
     def halflightR(data, mass=False):
