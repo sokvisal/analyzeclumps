@@ -213,7 +213,7 @@ def retrieved_maps(directories, path):
         zp = float(os.path.basename(d).split('_')[2].split('-')[1])
         tmpmass = getMSFR(idnum)[0]
 
-        if os.path.isfile(d+'/test_phot/cosmos.fout'):# tmpmass<10. and zp>1.:
+        if os.path.isfile(d+'/test_phot/cosmos.fout') and zp<0.7:# tmpmass<10. and zp>1.:
             tmpxc, tmpyc, a, b, phi = _get_ellipse_params('./{}/a{}/watershed_segmaps/_id-{}.fits'.format(path, tile, idnum))
             segmap = fits.open('./{}/a{}/watershed_segmaps/_id-{}.fits'.format(path, tile, idnum))[0].data
             segmap[segmap==0] = np.nan
@@ -247,7 +247,7 @@ def retrieved_maps(directories, path):
                 # # plotting the co-added normalized profile
                 fig, clumpids, ccs, agew_rnorm = normprofiles.make_profile(rgbimg, maps, normmaps,\
                                 params, [zp, idnum], tile, outerflux, res=[None, None, None, None],\
-                                                                           savedir=False, showplot=False)
+                                                                           savedir='plots/{}'.format(tile), showplot=False)
                 # fig, clumpids, clumpiness, ccs = old_normporfiles.caddnorm_plot(rgbimg, maps, normmaps, params, idnum, res)
 
 
