@@ -116,10 +116,10 @@ def caddnorm_plot(rgb_img, maps, normmaps, params, titleparams, res): # yi, xi, 
 
     segrgb = rgb_img[c-citv:c+citv,c-citv:c+citv]
 
-    # nrow = 4
-    # ncol = 4
-    # plt.rcParams.update({'font.size':6})
-    # fig = plt.figure(figsize=((ncol+1)*2.*3.4/4., (nrow+1)*2.))
+    nrow = 4
+    ncol = 4
+    plt.rcParams.update({'font.size':6})
+    fig = plt.figure(figsize=((ncol+1)*2.*3.4/4., (nrow+1)*2.))
     #
     # from misc import rainbowb
     # from matplotlib import gridspec
