@@ -1,8 +1,8 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-# from skimage.feature import peak_local_max
-# from skimage.segmentation import watershed
+from skimage.feature import peak_local_max
+from skimage.segmentation import watershed
 from scipy import ndimage as ndi
 from scipy import interpolate
 import os
