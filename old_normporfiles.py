@@ -582,7 +582,8 @@ def coadd_profile(prop, phot_vars, zphot):
             plt.show()
 
 #         theta = g_fit.mean.value
-        return np.deg2rad(tmax), a, b
+        return np.deg2rad(mode(theta.ravel().astype(int))[0][0]), a, b
+        # return np.deg2rad(tmax), a, b
         # return np.deg2rad(mode(theta.ravel().astype(int))[0][0]), max(r.ravel()), mode(r.ravel().astype(int))[0][0]
 
     def ellipses(a, b, to):
@@ -627,6 +628,7 @@ def coadd_profile(prop, phot_vars, zphot):
             maxr = a*2
         else:
             maxr = int(a*2)
+            mar = a*0.6
         # print data.shape, len(xi)
         for i in np.arange(1,maxr):
             # b = i*np.sqrt(1-e**2)
