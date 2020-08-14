@@ -518,54 +518,45 @@ def coadd_profile(prop, phot_vars, zphot):
         rbinsize = 2
         binr = np.arange(0,50+rbinsize,rbinsize)
 
-        htheta = np.histogram(theta, bins = bintheta, density=True)
-        hr = np.histogram(r, bins = binr, density=True)
+        # htheta = np.histogram(theta, bins = bintheta, density=True)
+        # hr = np.histogram(r, bins = binr, density=True)
+        #
+        # from scipy import interpolate
+        # from sklearn import mixture
+        # rs = np.arange(rbinsize/2., 50+rbinsize/2., rbinsize)
+        # ts = np.arange(tbinsize/2., 180+tbinsize/2., tbinsize)
+        #
+        # samples = np.dstack((rs,hr[0]))[0]
+        #
+        # def getbimodal(data, xbins, angle=False):
+        #     from scipy import interpolate
+        #     from sklearn import mixture
+        #
+        #     def gauss_function(x, amp, x0, sigma):
+        #         return amp * np.exp(-(x - x0) ** 2. / (2. * sigma ** 2.))
+        #
+        #     gmix = mixture.GaussianMixture(n_components = 2)
+        #     fitted = gmix.fit(data) # data is shaped as (len, 1)
+        #
+        #      # Construct function manually as sum of gaussians
+        #     gmm_sum = np.full_like(xbins, fill_value=0, dtype=np.float32)
+        #     for m, c, w in zip(fitted.means_.ravel(), fitted.covariances_.ravel(), fitted.weights_.ravel()):
+        #         gauss = gauss_function(x=xbins, amp=1, x0=m, sigma=np.sqrt(c))
+        #         gmm_sum += gauss / np.trapz(gauss, xbins) * w
+        #
+        #         mindis = np.min([fitted.means_[0], fitted.means_[1]])
+        #         maxdis = np.max([fitted.means_[0], fitted.means_[1]])
+        #         if angle:
+        #             minidx = np.argmin(fitted.weights_)
+        #             mindis = fitted.means_[minidx][0]
+        #             maxidx = np.argmax(fitted.weights_)
+        #             maxdis = fitted.means_[maxidx][0]
+        #
+        #     return mindis, maxdis, gmm_sum
+        #
+        # b, a, gmm_r_sum = getbimodal(r, rs)
+        # tmin, tmax, gmm_t_sum = getbimodal(theta, ts, angle=True)
 
-        from scipy import interpolate
-        from sklearn import mixture
-        rs = np.arange(rbinsize/2., 50+rbinsize/2., rbinsize)
-        ts = np.arange(tbinsize/2., 180+tbinsize/2., tbinsize)
-
-        samples = np.dstack((rs,hr[0]))[0]
-
-        def getbimodal(data, xbins, angle=False):
-            from scipy import interpolate
-            from sklearn import mixture
-
-            def gauss_function(x, amp, x0, sigma):
-                return amp * np.exp(-(x - x0) ** 2. / (2. * sigma ** 2.))
-
-            gmix = mixture.GaussianMixture(n_components = 2)
-            fitted = gmix.fit(data) # data is shaped as (len, 1)
-
-             # Construct function manually as sum of gaussians
-            gmm_sum = np.full_like(xbins, fill_value=0, dtype=np.float32)
-            for m, c, w in zip(fitted.means_.ravel(), fitted.covariances_.ravel(), fitted.weights_.ravel()):
-                gauss = gauss_function(x=xbins, amp=1, x0=m, sigma=np.sqrt(c))
-                gmm_sum += gauss / np.trapz(gauss, xbins) * w
-
-                mindis = np.min([fitted.means_[0], fitted.means_[1]])
-                maxdis = np.max([fitted.means_[0], fitted.means_[1]])
-                if angle:
-                    minidx = np.argmin(fitted.weights_)
-                    mindis = fitted.means_[minidx][0]
-                    maxidx = np.argmax(fitted.weights_)
-                    maxdis = fitted.means_[maxidx][0]
-
-            return mindis, maxdis, gmm_sum
-
-        b, a, gmm_r_sum = getbimodal(r, rs)
-        tmin, tmax, gmm_t_sum = getbimodal(theta, ts, angle=True)
-
-#         from astropy.modeling import models, fitting
-#         maxbid = np.where(htheta[0]==htheta[0].max())[0][0]
-#         amplitude = htheta[0][maxbid]
-#         maxmean = htheta[1][maxbid]
-
-#         binfit = np.arange(tbinsize/2., 180+tbinsize/2., tbinsize)
-#         g = models.Gaussian1D(amplitude, maxmean, 5.)
-#         fitter = fitting.SLSQPLSQFitter()
-#         g_fit = fitter(g, binfit, htheta[0])
 
         if diagnostic:
             plt.subplots(1,2, figsize=(6,3))
