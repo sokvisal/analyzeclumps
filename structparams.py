@@ -149,7 +149,7 @@ def setup_profile(center, a, b, phi, physvars, photvars, zphot, weightmap=False)
         if mass:
             arange =  np.arange(1,a)
         else:
-            arange =  np.arange(1,.6*a)
+            arange =  np.arange(1,.5*a)
         for i in arange:
             b = i*np.sqrt(1-e**2)
             ell = ((xi-xc)*np.cos(phi)+(yi-yc)*np.sin(phi))**2./i**2 + ((xi-xc)*np.sin(phi)-(yi-yc)*np.cos(phi))**2./(b)**2.

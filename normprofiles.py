@@ -166,8 +166,8 @@ def make_profile(rgb_img, maps, normmaps, params, titleparams, tile, outerflux=[
     clumpmaps = [clumpmap_m, clumpmap_2800, clumpmap_u, clumpmap_v]
     clumpmaps_raveled = [clumpmap_m_r, clumpmap_2800_r, clumpmap_u_r, clumpmap_v_r]
     for i, map in enumerate(clumpmaps):
-        # clumpmaps[i] = _find_clumpregions(map, clumpid=4)
-        # clumpmaps[i] = _find_clumpregions(clumpmaps[i], clumpid=3)
+        clumpmaps[i] = _find_clumpregions(map, clumpid=4)
+        clumpmaps[i] = _find_clumpregions(clumpmaps[i], clumpid=3)
         clumpmaps_raveled[i] = _ravel_nonnan_map(clumpmaps[i])
     clumpmap_m, clumpmap_2800, clumpmap_u, clumpmap_v = clumpmaps
     clumpmap_m_r, clumpmap_2800_r, clumpmap_u_r, clumpmap_v_r = clumpmaps_raveled
