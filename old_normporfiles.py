@@ -582,9 +582,9 @@ def coadd_profile(prop, phot_vars, zphot):
             plt.show()
 
 #         theta = g_fit.mean.value
-        return np.deg2rad(mode(theta.ravel().astype(int))[0][0]), a, b
+        # return np.deg2rad(mode(theta.ravel().astype(int))[0][0]), a, b
         # return np.deg2rad(tmax), a, b
-        # return np.deg2rad(mode(theta.ravel().astype(int))[0][0]), max(r.ravel()), mode(r.ravel().astype(int))[0][0]
+        return np.deg2rad(mode(theta.ravel().astype(int))[0][0]), max(r.ravel()), mode(r.ravel().astype(int))[0][0]
 
     def ellipses(a, b, to):
         # to = np.deg2rad(to)
@@ -613,7 +613,7 @@ def coadd_profile(prop, phot_vars, zphot):
     to, a, b = galparams(stellar_mass)
     e = b/a
     # e = np.sqrt(1-b**2/a**2)
-    e = mwb/mwa
+    # e = mwb/mwa
 #     print 'gal params: ', to, mwb, mwa
 
     def halflightR(data, mass=False):
@@ -625,10 +625,9 @@ def coadd_profile(prop, phot_vars, zphot):
         npix = []
 
         if mass:
-            maxr = a*2
+            maxr = a
         else:
-            maxr = int(a*2)
-        maxr = a*0.8
+            maxr = a*0.8 #int(a*2)
         # print data.shape, len(xi)
         for i in np.arange(1,maxr):
             # b = i*np.sqrt(1-e**2)
