@@ -232,9 +232,9 @@ def retrieved_maps(directories, path):
 
                 physvars *= segmap
                 photvars *= segmap
-                # mass, params, normmaps, diagnostics, outerflux =\
-                #                 structparams.setup_profile([tmpyc, tmpxc], a, b, phi, physvars, photvars, zp)
-                mass, params, normmaps, diagnostics, res = old_normporfiles.coadd_profile(physvars, photvars, zp)
+                mass, params, normmaps, diagnostics, outerflux =\
+                                structparams.setup_profile([tmpyc, tmpxc], a, b, phi, physvars, photvars, zp)
+                # mass, params, normmaps, diagnostics, res = old_normporfiles.coadd_profile(physvars, photvars, zp)
 
 
                 maps = [physvars[0], physvars[1], photvars[1], photvars[2], -2.5*np.log10(photvars[1]/photvars[2]), binmap]
@@ -243,12 +243,12 @@ def retrieved_maps(directories, path):
                 selzp.append(zp)
                 physicals.append([galmass_idl, galmass_c, mass, galsfr, np.log10(np.nansum(10**physvars[1]))])
 
-                # # 'radial_profiles'
-                # # plotting the co-added normalized profile
-                # fig, clumpids, ccs, agew_rnorm = normprofiles.make_profile(rgbimg, maps, normmaps,\
-                #                 params, [zp, idnum], tile, outerflux, res=[None, None, None, None],\
-                #                                                            savedir=False, showplot=False) #'{}/plots/{}'.format(path, tile)
-                fig, clumpids, clumpiness, ccs = old_normporfiles.caddnorm_plot(rgbimg, maps, normmaps, params, [zp, idnum], res)
+                # 'radial_profiles'
+                # plotting the co-added normalized profile
+                fig, clumpids, ccs, agew_rnorm = normprofiles.make_profile(rgbimg, maps, normmaps,\
+                                params, [zp, idnum], tile, outerflux, res=[None, None, None, None],\
+                                                                           savedir=False, showplot=False) #'{}/plots/{}'.format(path, tile)
+                # fig, clumpids, clumpiness, ccs = old_normporfiles.caddnorm_plot(rgbimg, maps, normmaps, params, [zp, idnum], res)
 
 
                 newcat_clumps.append([idnum, zp,  galmass_idl, mass, galsfr] + clumpids + ccs + diagnostics)
@@ -271,11 +271,11 @@ def createCat(decpath, tile):
     ids_clumps = np.array(ids_clumps)
 
     from astropy.table import Table
-    # ids_clumps_cat = Table([ids_clumps[:,i] for i in range(18)],\
-    #                        names=('id', 'z', 'lm', 'lm_res', 'lsfr', 'mclump', 'fuclump', 'uclump', 'vclump',\
-    #                               'mfrac', 'fufrac', 'ufrac', 'vfrac', 'cc_sm', 'cc_sfr', 'cm_density', 'issfr', 'ossfr'),\
-    #                                meta={'name': 'cosmos clump id'})
-    ids_clumps_cat = Table([ids_clumps[:,i] for i in range(14)],\
-                           names=('id', 'z', 'lm', 'lm_res', 'lsfr', 'mclump', 'fuclump', 'uclump', 'vclump', 'cc_sm', 'cc_sfr', 'cm_density', 'issfr', 'ossfr'),\
+    ids_clumps_cat = Table([ids_clumps[:,i] for i in range(18)],\
+                           names=('id', 'z', 'lm', 'lm_res', 'lsfr', 'mclump', 'fuclump', 'uclump', 'vclump',\
+                                  'mfrac', 'fufrac', 'ufrac', 'vfrac', 'cc_sm', 'cc_sfr', 'cm_density', 'issfr', 'ossfr'),\
                                    meta={'name': 'cosmos clump id'})
-    ascii.write(ids_clumps_cat, '{}/clumps-catalog-old.dat'.format(dirname[:-5]), overwrite=True, format='commented_header')
+    # ids_clumps_cat = Table([ids_clumps[:,i] for i in range(14)],\
+    #                        names=('id', 'z', 'lm', 'lm_res', 'lsfr', 'mclump', 'fuclump', 'uclump', 'vclump', 'cc_sm', 'cc_sfr', 'cm_density', 'issfr', 'ossfr'),\
+    #                                meta={'name': 'cosmos clump id'})
+    # ascii.write(ids_clumps_cat, '{}/clumps-catalog-old.dat'.format(dirname[:-5]), overwrite=True, format='commented_header')
