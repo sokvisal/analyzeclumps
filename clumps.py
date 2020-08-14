@@ -174,7 +174,7 @@ def stellarPopMaps(directory, path):
                 Hscale = normH[i]/1.
 
                 scalemass = np.sum(10**lm[i]*normIR)/np.sum(10**lm[i]*npix)
-                physvars[0, ny, nx] = lm[i]#np.log10(10**lm[i]*normIR/scalemass)
+                physvars[0, ny, nx] = np.log10(10**lm[i]*normIR/scalemass)
                 physvars[1, ny, nx] = lsfr[i]
                 physvars[2, ny, nx] = 1./scalemass #np.log10(10**lm[i]*nirscale/scalemass) #sfrw_age(la[i], lsfr[i])#-np.log10(npix)
 
@@ -182,9 +182,9 @@ def stellarPopMaps(directory, path):
 
                 photvars[0, ny,nx] = l2800[i]
                 ufact = np.sum(umag[i]*normUV)/np.sum(umag[i]*npix)
-                photvars[1, ny,nx] = umag[i]#*normUV/ufact#*(normu[idx]/ubinscale)#/npix *normUV/ufact#
+                photvars[1, ny,nx] = umag[i]*normUV/ufact#*(normu[idx]/ubinscale)#/npix *normUV/ufact#
                 vfact = np.sum(vmag[i]*normV)/np.sum(vmag[i]*npix)
-                photvars[2, ny,nx] = vmag[i]#*normV/vfact#*(normv[idx]/vbinscale)#/npix *normV/vfact#
+                photvars[2, ny,nx] = vmag[i]*normV/vfact#*(normv[idx]/vbinscale)#/npix *normV/vfact#
 
         tmpvars[0][np.isnan(tmpvars[0])] = 0.
         tmpy, tmpx = np.unravel_index(np.argmax(tmpvars[0]), tmpvars[0].shape)
@@ -208,7 +208,7 @@ def retrieved_maps(directories, path):
     badcounts = 0
     tmpdirs = [idnames for idnames in glob.glob(directories)[:] if len(glob.glob(idnames+'/*-*'))==14]
 #     print [int(os.path.basename(idnames.split('_')[1].split('-')[1])) for idnames in glob.glob(directories)[:] if len(glob.glob(idnames+'/*-*'))==14]
-    for d in tmpdirs[:]: #glob.glob(directories)[:]
+    for d in tqdm(tmpdirs[:]): #glob.glob(directories)[:]
         idnum = int(os.path.basename(d).split('_')[1].split('-')[1])
         zp = float(os.path.basename(d).split('_')[2].split('-')[1])
         tmpmass = getMSFR(idnum)[0]
@@ -254,7 +254,6 @@ def retrieved_maps(directories, path):
                 newcat_clumps.append([idnum, zp,  galmass_idl, mass, galsfr] + clumpids + ccs + diagnostics)
 
 #                 if abs(galmass_idl-mass)>0.3:
-                print (d, galmass_idl, mass)
 #                 misc.tmpsedfits(d, binshape)
 
                 master_mmap.append(normmaps[0][2:])
