@@ -602,8 +602,8 @@ def coadd_profile(prop, phot_vars, zphot):
     #w = stellar_mass.shape[0]
 
     to, a, b = galparams(stellar_mass)
-    e = b/a
-    # e = np.sqrt(1-b**2/a**2)
+    # e = b/a
+    e = np.sqrt(1-b**2/a**2)
     # e = mwb/mwa
 #     print 'gal params: ', to, mwb, mwa
 
@@ -621,9 +621,9 @@ def coadd_profile(prop, phot_vars, zphot):
             maxr = a*0.4 #int(a*2)
         # print data.shape, len(xi)
         for i in np.arange(1,maxr):
-            # b = i*np.sqrt(1-e**2)
-            # ell = ((xi-xc)*np.cos(to)+(yi-yc)*np.sin(to))**2./i**2 + ((xi-xc)*np.sin(to)-(yi-yc)*np.cos(to))**2./(b)**2.
-            ell = ((xi-xc)*np.cos(to)+(yi-yc)*np.sin(to))**2./i**2 + ((xi-xc)*np.sin(to)-(yi-yc)*np.cos(to))**2./(i*e)**2.
+            b = i*np.sqrt(1-e**2)
+            ell = ((xi-xc)*np.cos(to)+(yi-yc)*np.sin(to))**2./i**2 + ((xi-xc)*np.sin(to)-(yi-yc)*np.cos(to))**2./(b)**2.
+            # ell = ((xi-xc)*np.cos(to)+(yi-yc)*np.sin(to))**2./i**2 + ((xi-xc)*np.sin(to)-(yi-yc)*np.cos(to))**2./(i*e)**2.
             tmpidx = np.where(ell<1)[0]
 
             summ.append(sum(data[tmpidx]))
