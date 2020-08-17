@@ -10,7 +10,7 @@ import glob
 import diagnostics
 
 
-def caddnorm_plot(rgb_img, maps, normmaps, params, titleparams, res, save=False, savedir=None): # yi, xi, norm_r, norm_quan, uvmap
+def caddnorm_plot(rgb_img, maps, normmaps, params, titleparams, res, show=False, savedir=False): # yi, xi, norm_r, norm_quan, uvmap
     sm, sfr, lu, lv, uvrest, binmap = maps
     massNorm = normmaps[0]
     Norm2800 = normmaps[1]
@@ -330,8 +330,12 @@ def caddnorm_plot(rgb_img, maps, normmaps, params, titleparams, res, save=False,
     ax.yaxis.set_label_position("right")
     ax.set_ylabel(r'log($\Sigma/\Sigma_{e}$)')
     ax.set_xlabel('log(R/R$_e$)')
-    if save:
+    if show and type(savedir) != type(True):
         plt.savefig(savedir+'/_id-{}.png'.format(titleparams[1]), dpi=300, bbox_inches = 'tight')
+        plt.close()
+    elif show:
+        plt.show()
+    else:
         plt.close()
 
     # if save is None: plt.show()
@@ -508,6 +512,9 @@ def coadd_profile(prop, phot_vars, zphot):
     # plt.show()
 
     def galparams(stellar_mass, diagnostic=False):
+
+        def myround(array, base=10):
+            return [base * round(x/base) for x in array]
         import matplotlib.pyplot as plt
         from scipy.stats import mode
 
@@ -515,10 +522,13 @@ def coadd_profile(prop, phot_vars, zphot):
         theta = np.rad2deg(np.arctan2((yi-yc), (xi-xc)))
         theta[theta<0] += 180.
 
-        tbinsize = 5
+        tbinsize = 10
         bintheta = np.arange(0,180+tbinsize,tbinsize)
         rbinsize = 2
         binr = np.arange(0,50+rbinsize,rbinsize)
+
+        # plt.hist(theta, bins = bintheta, density=True)
+        # plt.show()
 
         # htheta = np.histogram(theta, bins = bintheta, density=True)
         # hr = np.histogram(r, bins = binr, density=True)
@@ -577,7 +587,7 @@ def coadd_profile(prop, phot_vars, zphot):
 #         theta = g_fit.mean.value
         # return np.deg2rad(mode(theta.ravel().astype(int))[0][0]), a, b
         # return np.deg2rad(tmax), a, b
-        return np.deg2rad(mode(theta.ravel().astype(int))[0][0]), max(r.ravel()), mode(r.ravel().astype(int))[0][0]
+        return np.deg2rad(mode(myround(theta.ravel()))[0][0]), max(r.ravel()), mode(r.ravel().astype(int))[0][0]
 
     def ellipses(a, b, to):
         # to = np.deg2rad(to)
