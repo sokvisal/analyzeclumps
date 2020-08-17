@@ -331,7 +331,7 @@ def caddnorm_plot(rgb_img, maps, normmaps, params, titleparams, res, save=False,
     ax.set_ylabel(r'log($\Sigma/\Sigma_{e}$)')
     ax.set_xlabel('log(R/R$_e$)')
     if save:
-        plt.savefig(savedir, dpi=300, bbox_inches = 'tight')
+        plt.savefig(savedir+'/_id-{}.png'.format(titleparams[1]), dpi=300, bbox_inches = 'tight')
         plt.close()
 
     # if save is None: plt.show()
