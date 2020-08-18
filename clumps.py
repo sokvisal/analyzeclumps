@@ -226,7 +226,7 @@ def retrieved_maps(directories, path):
             boolcheck, coords = stellarPopMaps(d, path)
             if type(boolcheck) == type(True):
                 badcounts += 1
-            elif 0.7<b/a<1.0:
+            elif 0.6<b/a<=1.:
                 physvars, photvars, binmap, binshape = boolcheck
                 binshape = np.array(sorted(binshape, key=itemgetter(1))[:21])
 
