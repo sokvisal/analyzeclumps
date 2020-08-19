@@ -248,7 +248,7 @@ def retrieved_maps(directories, path):
                 # fig, clumpids, ccs, agew_rnorm = normprofiles.make_profile(rgbimg, maps, normmaps,\
                 #                 params, [zp, idnum], tile, outerflux, res=[None, None, None, None],\
                 #                                                            savedir=False, showplot=False) #'{}/plots/{}'.format(path, tile)
-                fig, clumpids, clumpiness, ccs = old_normporfiles.caddnorm_plot(rgbimg, maps, normmaps, params, [zp, idnum], res, show=False, savedir=False) #'{}/plots/{}'.format(path, tile))
+                fig, clumpids, clumpiness, ccs = old_normporfiles.caddnorm_plot(rgbimg, maps, normmaps, params, [zp, idnum], res, show=True, savedir='{}/plots/{}'.format(path, tile))) #'{}/plots/{}'.format(path, tile))
 
 
                 newcat_clumps.append([idnum, zp,  galmass_idl, mass, galsfr] + clumpids + ccs + diagnostics)
