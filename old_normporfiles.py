@@ -527,9 +527,6 @@ def coadd_profile(prop, phot_vars, zphot):
         rbinsize = 2
         binr = np.arange(0,50+rbinsize,rbinsize)
 
-        # plt.hist(theta, bins = bintheta, density=True)
-        # plt.show()
-
         # htheta = np.histogram(theta, bins = bintheta, density=True)
         # hr = np.histogram(r, bins = binr, density=True)
         #
@@ -585,9 +582,9 @@ def coadd_profile(prop, phot_vars, zphot):
             plt.show()
 
 #         theta = g_fit.mean.value
-        # return np.deg2rad(mode(theta.ravel().astype(int))[0][0]), a, b
         # return np.deg2rad(tmax), a, b
-        return np.deg2rad(mode(myround(theta.ravel()))[0][0]), max(r.ravel()), mode(r.ravel().astype(int))[0][0]
+        # print (mode(myround(theta.ravel()))[0][0],  max(myround(r.ravel(), 2)), mode(myround(r.ravel(), 2))[0][0] )
+        return np.deg2rad(mode(myround(theta.ravel()))[0][0]), max(myround(r.ravel(), 2)), mode(myround(r.ravel(), 2))[0][0]
 
     def ellipses(a, b, to):
         # to = np.deg2rad(to)
@@ -595,9 +592,10 @@ def coadd_profile(prop, phot_vars, zphot):
         ells = []
         for i in np.arange(1,3):
             t = np.linspace(0, 2*np.pi, 100)
-            Ell = np.array([i*a*np.cos(t) , i*b*np.sin(t)])
+            Ell = np.array([i*a*np.cos(t), i*b*np.sin(t)])
                  #u,v removed to keep the same center location
-            R_rot = np.array([[np.cos(to) , -np.sin(to)],[np.sin(to) , np.cos(to)]])
+            R_rot = np.array([[np.cos(to), -np.sin(to)],\
+                              [np.sin(to), np.cos(to)]])
                  #2-D rotation matrix
 
             Ell_rot = np.zeros((2,Ell.shape[1]))
@@ -614,8 +612,9 @@ def coadd_profile(prop, phot_vars, zphot):
     #w = stellar_mass.shape[0]
 
     to, a, b = galparams(stellar_mass)
-    # e = b/a
-    e = np.sqrt(1-b**2/a**2)
+    e = b/a # axial ratio as defined by Wuyts12
+    # e = np.sqrt(1-b**2/a**2)
+    # print ('eccentricity', e, b/a)
     # e = mwb/mwa
 #     print 'gal params: ', to, mwb, mwa
 
@@ -633,9 +632,9 @@ def coadd_profile(prop, phot_vars, zphot):
             maxr = a*0.5 #int(a*2)
         # print data.shape, len(xi)
         for i in np.arange(1,maxr):
-            b = i*np.sqrt(1-e**2)
-            ell = ((xi-xc)*np.cos(to)+(yi-yc)*np.sin(to))**2./i**2 + ((xi-xc)*np.sin(to)-(yi-yc)*np.cos(to))**2./(b)**2.
-            # ell = ((xi-xc)*np.cos(to)+(yi-yc)*np.sin(to))**2./i**2 + ((xi-xc)*np.sin(to)-(yi-yc)*np.cos(to))**2./(i*e)**2.
+            # b = i*np.sqrt(1-e**2)
+            # ell = ((xi-xc)*np.cos(to)+(yi-yc)*np.sin(to))**2./i**2 + ((xi-xc)*np.sin(to)-(yi-yc)*np.cos(to))**2./(b)**2.
+            ell = ((xi-xc)*np.cos(to)+(yi-yc)*np.sin(to))**2./i**2 + ((xi-xc)*np.sin(to)-(yi-yc)*np.cos(to))**2./(i*e)**2.
             tmpidx = np.where(ell<1)[0]
 
             summ.append(sum(data[tmpidx]))
