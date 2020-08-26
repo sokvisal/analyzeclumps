@@ -226,7 +226,7 @@ def retrieved_maps(directories, path):
             boolcheck, coords = stellarPopMaps(d, path)
             if type(boolcheck) == type(True):
                 badcounts += 1
-            elif 0.8>np.sqrt(1-b**2/a**2): # remove highly eccentric galaxies, maybe edge on galaxies?
+            else: #elif 0.8>np.sqrt(1-b**2/a**2): # remove highly eccentric galaxies, maybe edge on galaxies?
                 physvars, photvars, binmap, binshape = boolcheck
                 binshape = np.array(sorted(binshape, key=itemgetter(1))[:21])
 
