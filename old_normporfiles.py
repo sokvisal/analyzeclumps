@@ -519,8 +519,11 @@ def coadd_profile(prop, phot_vars, zphot):
         from scipy.stats import mode
 
         r = np.sqrt((yi-yc)**2 + (xi-xc)**2)
+        percentile = np.percentile(r.ravel(), 90)
+
         theta = np.rad2deg(np.arctan2((yi-yc), (xi-xc)))
         theta[theta<0] += 180.
+        theta = theta[r.ravel()<percentile]
 
         tbinsize = 10
         bintheta = np.arange(0,180+tbinsize,tbinsize)
@@ -595,7 +598,7 @@ def coadd_profile(prop, phot_vars, zphot):
         # print (mode(myround(theta.ravel()))[0][0],  max(myround(r.ravel(), 2)), mode(myround(r.ravel(), 2))[0][0] )
         # return np.deg2rad(mode(myround(theta.ravel()))[0][0]), max(myround(r.ravel(), 2)), mode(myround(r.ravel(), 2))[0][0]
 
-        return np.deg2rad(mode(myround(theta.ravel()))[0][0]), np.percentile(r.ravel(), 90), mode(myround(r.ravel(), 2))[0][0]
+        return np.deg2rad(mode(myround(theta.ravel()))[0][0]), percentile, mode(myround(r.ravel(), 2))[0][0]
 
     def ellipses(a, b, to):
         # to = np.deg2rad(to)
@@ -638,9 +641,9 @@ def coadd_profile(prop, phot_vars, zphot):
         npix = []
 
         if mass:
-            maxr = a*0.5
+            maxr = a*0.7
         else:
-            maxr = a*0.5 #int(a*2)
+            maxr = a*0.7 #int(a*2)
         # print data.shape, len(xi)
         for i in np.arange(1,maxr):
             # b = i*np.sqrt(1-e**2)
