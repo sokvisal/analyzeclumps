@@ -641,9 +641,9 @@ def coadd_profile(prop, phot_vars, zphot):
         npix = []
 
         if mass:
-            maxr = a*0.7
+            maxr = a*0.6
         else:
-            maxr = a*0.7 #int(a*2)
+            maxr = a*0.6 #int(a*2)
         # print data.shape, len(xi)
         for i in np.arange(1,maxr):
             # b = i*np.sqrt(1-e**2)
