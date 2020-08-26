@@ -519,7 +519,7 @@ def coadd_profile(prop, phot_vars, zphot):
         from scipy.stats import mode
 
         r = np.sqrt((yi-yc)**2 + (xi-xc)**2)
-        percentile = np.percentile(r.ravel(), 90)
+        percentile = np.percentile(r.ravel(), 95)
 
         theta = np.rad2deg(np.arctan2((yi-yc), (xi-xc)))
         theta[theta<0] += 180.
