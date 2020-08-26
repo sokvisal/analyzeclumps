@@ -16,7 +16,7 @@ def caddnorm_plot(rgb_img, maps, normmaps, params, titleparams, res, show=False,
     Norm2800 = normmaps[1]
     uNorm = normmaps[2]
     vNorm = normmaps[3]
-    xc, yc, ell_mh, ell_mf, ell_2800h, ell_2800f, ell_uh, ell_uf, ell_vh, ell_vf = params
+    xc, yc, to, a, b, ell_mh, ell_mf, ell_2800h, ell_2800f, ell_uh, ell_uf, ell_vh, ell_vf = params
 
     c = rgb_img.shape[0]/2
     citv = int(c*2/3)
@@ -704,7 +704,7 @@ def coadd_profile(prop, phot_vars, zphot):
 
         return ssfr_i, ssfr_o
 
-    gal_par = [xc, yc]
+    gal_par = [xc, yc, to, a, b]
     norm_par = []
     res = []
     for i, physvar in enumerate(prop[:1]):
