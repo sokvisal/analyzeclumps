@@ -226,39 +226,39 @@ def retrieved_maps(directories, path):
             boolcheck, coords = stellarPopMaps(d, path)
             if type(boolcheck) == type(True):
                 badcounts += 1
-            else: #elif 0.8>np.sqrt(1-b**2/a**2): # remove highly eccentric galaxies, maybe edge on galaxies?
+            elif 0.8>np.sqrt(1-b**2/a**2): # remove highly eccentric galaxies, maybe edge on galaxies?
                 physvars, photvars, binmap, binshape = boolcheck
                 binshape = np.array(sorted(binshape, key=itemgetter(1))[:21])
 
                 physvars *= segmap
                 photvars *= segmap
-                # mass, params, normmaps, diagnostics, outerflux =\
-                #                 structparams.setup_profile([tmpyc, tmpxc], a, b, phi, physvars, photvars, zp)
-                mass, params, normmaps, diagnostics, res = old_normporfiles.coadd_profile(physvars, photvars, zp)
+                mass, params, normmaps, diagnostics, outerflux =\
+                                structparams.setup_profile([tmpyc, tmpxc], a, b, phi, physvars, photvars, zp)
+                # mass, params, normmaps, diagnostics, res = old_normporfiles.coadd_profile(physvars, photvars, zp)
 
-                if 0.6<=params[4]/params[3]<=1.:
-                    maps = [physvars[0], physvars[1], photvars[1], photvars[2], -2.5*np.log10(photvars[1]/photvars[2]), binmap]
-                    galmass_idl, galmass_c, galsfr, hmag, bmag, zmag, umv = getMSFR(idnum)
+                # if 0.6<=params[4]/params[3]<=1.:
+                maps = [physvars[0], physvars[1], photvars[1], photvars[2], -2.5*np.log10(photvars[1]/photvars[2]), binmap]
+                galmass_idl, galmass_c, galsfr, hmag, bmag, zmag, umv = getMSFR(idnum)
 
-                    selzp.append(zp)
-                    physicals.append([galmass_idl, galmass_c, mass, galsfr, np.log10(np.nansum(10**physvars[1]))])
+                selzp.append(zp)
+                physicals.append([galmass_idl, galmass_c, mass, galsfr, np.log10(np.nansum(10**physvars[1]))])
 
-                    # # 'radial_profiles'
-                    # # plotting the co-added normalized profile
-                    # fig, clumpids, ccs, agew_rnorm = normprofiles.make_profile(rgbimg, maps, normmaps,\
-                    #                 params, [zp, idnum], tile, outerflux, res=[None, None, None, None],\
-                    #                                                            savedir='{}/plots/{}'.format(path, tile), showplot=True) #'{}/plots/{}'.format(path, tile)
-                    fig, clumpids, clumpiness, ccs = old_normporfiles.caddnorm_plot(rgbimg, maps, normmaps, params, [zp, idnum], res, show=False, savedir=False) #'{}/plots/{}'.format(path, tile)
+                # # 'radial_profiles'
+                # # plotting the co-added normalized profile
+                fig, clumpids, ccs, agew_rnorm = normprofiles.make_profile(rgbimg, maps, normmaps,\
+                                params, [zp, idnum], tile, outerflux, res=[None, None, None, None],\
+                                                                           savedir=False, showplot=False) #'{}/plots/{}'.format(path, tile)
+                # fig, clumpids, clumpiness, ccs = old_normporfiles.caddnorm_plot(rgbimg, maps, normmaps, params, [zp, idnum], res, show=False, savedir=False) #'{}/plots/{}'.format(path, tile)
 
 
-                    newcat_clumps.append([idnum, zp,  galmass_idl, mass, galsfr] + clumpids + ccs + diagnostics)
+                newcat_clumps.append([idnum, zp,  galmass_idl, mass, galsfr] + clumpids + ccs + diagnostics)
 
-    #                 if abs(galmass_idl-mass)>0.3:
-    #                 misc.tmpsedfits(d, binshape)
+#                 if abs(galmass_idl-mass)>0.3:
+#                 misc.tmpsedfits(d, binshape)
 
-                    master_mmap.append(normmaps[0][2:])
-                    master_umap.append(normmaps[1][2:])
-                    master_vmap.append(normmaps[2][2:])
+                master_mmap.append(normmaps[0][2:])
+                master_umap.append(normmaps[1][2:])
+                master_vmap.append(normmaps[2][2:])
 
     return [master_umap, master_vmap, master_mmap], physicals, selzp, test_lst, newcat_clumps
 
@@ -271,11 +271,11 @@ def createCat(decpath, tile):
     ids_clumps = np.array(ids_clumps)
 
     from astropy.table import Table
-    # ids_clumps_cat = Table([ids_clumps[:,i] for i in range(18)],\
-    #                        names=('id', 'z', 'lm', 'lm_res', 'lsfr', 'mclump', 'fuclump', 'uclump', 'vclump',\
-    #                               'mfrac', 'fufrac', 'ufrac', 'vfrac', 'cc_sm', 'cc_sfr', 'cm_density', 'issfr', 'ossfr'),\
-    #                                meta={'name': 'cosmos clump id'})
-    ids_clumps_cat = Table([ids_clumps[:,i] for i in range(14)],\
-                           names=('id', 'z', 'lm', 'lm_res', 'lsfr', 'mclump', 'fuclump', 'uclump', 'vclump', 'cc_sm', 'cc_sfr', 'cm_density', 'issfr', 'ossfr'),\
+    ids_clumps_cat = Table([ids_clumps[:,i] for i in range(18)],\
+                           names=('id', 'z', 'lm', 'lm_res', 'lsfr', 'mclump', 'fuclump', 'uclump', 'vclump',\
+                                  'mfrac', 'fufrac', 'ufrac', 'vfrac', 'cc_sm', 'cc_sfr', 'cm_density', 'issfr', 'ossfr'),\
                                    meta={'name': 'cosmos clump id'})
-    ascii.write(ids_clumps_cat, '{}/clumps-catalog-old.dat'.format(dirname[:-5]), overwrite=True, format='commented_header')
+    # ids_clumps_cat = Table([ids_clumps[:,i] for i in range(14)],\
+    #                        names=('id', 'z', 'lm', 'lm_res', 'lsfr', 'mclump', 'fuclump', 'uclump', 'vclump', 'cc_sm', 'cc_sfr', 'cm_density', 'issfr', 'ossfr'),\
+    #                                meta={'name': 'cosmos clump id'})
+    ascii.write(ids_clumps_cat, '{}/clumps-catalog.dat'.format(dirname[:-5]), overwrite=True, format='commented_header')
