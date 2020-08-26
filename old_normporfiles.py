@@ -527,6 +527,15 @@ def coadd_profile(prop, phot_vars, zphot):
         rbinsize = 2
         binr = np.arange(0,50+rbinsize,rbinsize)
 
+        # print (np.percentile(r.ravel(), 95))
+        # plt.hist(r, bins = binr, density=True)
+        # plt.show()
+        #
+        # plt.hist(np.percentile(r.ravel(), 95), bins = binr, density=True)
+        # plt.show()
+        #
+        # print (1/0.)
+
         # htheta = np.histogram(theta, bins = bintheta, density=True)
         # hr = np.histogram(r, bins = binr, density=True)
         #
@@ -584,7 +593,9 @@ def coadd_profile(prop, phot_vars, zphot):
 #         theta = g_fit.mean.value
         # return np.deg2rad(tmax), a, b
         # print (mode(myround(theta.ravel()))[0][0],  max(myround(r.ravel(), 2)), mode(myround(r.ravel(), 2))[0][0] )
-        return np.deg2rad(mode(myround(theta.ravel()))[0][0]), max(myround(r.ravel(), 2)), mode(myround(r.ravel(), 2))[0][0]
+        # return np.deg2rad(mode(myround(theta.ravel()))[0][0]), max(myround(r.ravel(), 2)), mode(myround(r.ravel(), 2))[0][0]
+
+        return np.deg2rad(mode(myround(theta.ravel()))[0][0]), np.percentile(r.ravel(), 90), mode(myround(r.ravel(), 2))[0][0]
 
     def ellipses(a, b, to):
         # to = np.deg2rad(to)
