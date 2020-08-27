@@ -676,7 +676,7 @@ def coadd_profile(prop, phot_vars, zphot):
             if counter:
                 norm_increase.append((summ[counter]-summ[counter-1])/summ[counter-1])
 
-                if norm_increase[counter-1]<0.02 or tmpr>maxr:
+                if norm_increase[counter-1]<0.05 or tmpr>maxr:
                     maxidx = np.argmax(summ)
                     hidx = np.argmin(abs(summ[:maxidx]-summ[maxidx]/2.))
                     qre = np.arange(1,maxr)[hidx]
