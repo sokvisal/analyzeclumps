@@ -631,36 +631,74 @@ def coadd_profile(prop, phot_vars, zphot):
     # print ('eccentricity', e, b/a)
     # e = mwb/mwa
 #     print 'gal params: ', to, mwb, mwa
-
+    import matplotlib.pyplot as plt
     def halflightR(data, mass=False):
         '''
         Return normalized array wrt half-light/half-mass radius
         Set mass to True if working with half-mass radius
         '''
         summ = []
+        norm_increase = []
         npix = []
 
         if mass:
             maxr = a*0.6
         else:
             maxr = a*0.6 #int(a*2)
-        # print data.shape, len(xi)
-        for i in np.arange(1,maxr):
-            # b = i*np.sqrt(1-e**2)
-            # ell = ((xi-xc)*np.cos(to)+(yi-yc)*np.sin(to))**2./i**2 + ((xi-xc)*np.sin(to)-(yi-yc)*np.cos(to))**2./(b)**2.
-            ell = ((xi-xc)*np.cos(to)+(yi-yc)*np.sin(to))**2./i**2 + ((xi-xc)*np.sin(to)-(yi-yc)*np.cos(to))**2./(i*e)**2.
+        maxr = a
+
+#         for counter, i in enumerate(np.arange(1,maxr)):
+#             # b = i*np.sqrt(1-e**2)
+#             # ell = ((xi-xc)*np.cos(to)+(yi-yc)*np.sin(to))**2./i**2 + ((xi-xc)*np.sin(to)-(yi-yc)*np.cos(to))**2./(b)**2.
+#             ell = ((xi-xc)*np.cos(to)+(yi-yc)*np.sin(to))**2./i**2 + ((xi-xc)*np.sin(to)-(yi-yc)*np.cos(to))**2./(i*e)**2.
+#             tmpidx = np.where(ell<1)[0]
+#
+#             summ.append(sum(data[tmpidx]))
+#             if counter: norm_increase.append((summ[counter]-summ[counter-1])/summ[counter-1])
+#             npix.append(len(tmpidx))
+#         maxidx = np.argmax(summ)
+#         # print xc, yc, 116692, 117896, 118009
+# #         print abs(summ[:maxidx]-summ[maxidx]/2.)
+#         hidx = np.argmin(abs(summ[:maxidx]-summ[maxidx]/2.))
+#         qre = np.arange(1,maxr)[hidx]
+#
+#         qnorm = summ[hidx]/npix[hidx]
+#         return qnorm, qre
+
+        counter = 0
+        tmpr = 1
+        while True:
+            ell = ((xi-xc)*np.cos(to)+(yi-yc)*np.sin(to))**2./tmpr**2 + ((xi-xc)*np.sin(to)-(yi-yc)*np.cos(to))**2./(tmpr*e)**2.
             tmpidx = np.where(ell<1)[0]
 
             summ.append(sum(data[tmpidx]))
             npix.append(len(tmpidx))
+            if counter:
+                norm_increase.append((summ[counter]-summ[counter-1])/summ[counter-1])
 
-        maxidx = np.argmax(summ)
-        # print xc, yc, 116692, 117896, 118009
-#         print abs(summ[:maxidx]-summ[maxidx]/2.)
-        hidx = np.argmin(abs(summ[:maxidx]-summ[maxidx]/2.))
-        qre = np.arange(1,maxr)[hidx]
-        qnorm = summ[hidx]/npix[hidx]
+                if norm_increase[counter-1]<0.02 or tmpr>maxr:
+                    maxidx = np.argmax(summ)
+                    hidx = np.argmin(abs(summ[:maxidx]-summ[maxidx]/2.))
+                    qre = np.arange(1,maxr)[hidx]
+                    qnorm = summ[hidx]/npix[hidx]
+                    break
+            tmpr += 1
+            counter += 1
+
+        # fig = plt.figure(figsize=(6,4))
+        # ax = fig.add_subplot(1,1,1)
+        # ax2 = ax.twinx()
+        #
+        # ax.scatter(np.arange(1,len(summ)+1), summ)
+        # # ax.axvline(x=maxidx)
+        # ax.axvline(x=qre, linestyle=':', color='grey')
+        #
+        # ax2.scatter(np.arange(2,len(summ)+1), norm_increase, color='tab:red')
+        # ax2.set_ylim([-0.05, 0.55])
+        # ax2.axhline(y=0.025, linestyle=':', color='grey')
+        # plt.show()
         return qnorm, qre
+
 
     def _re_cutoff(array, qre):
         ell = ((xi-xc)*np.cos(to)+(yi-yc)*np.sin(to))**2./(qre)**2 \
