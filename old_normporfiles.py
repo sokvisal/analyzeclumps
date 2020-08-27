@@ -645,42 +645,42 @@ def coadd_profile(prop, phot_vars, zphot):
             maxr = a*0.6
         else:
             maxr = a*0.6 #int(a*2)
-        maxr = a*0.6
+        maxr = a
 
-        for counter, i in enumerate(np.arange(1,maxr)):
-            # b = i*np.sqrt(1-e**2)
-            # ell = ((xi-xc)*np.cos(to)+(yi-yc)*np.sin(to))**2./i**2 + ((xi-xc)*np.sin(to)-(yi-yc)*np.cos(to))**2./(b)**2.
-            ell = ((xi-xc)*np.cos(to)+(yi-yc)*np.sin(to))**2./i**2 + ((xi-xc)*np.sin(to)-(yi-yc)*np.cos(to))**2./(i*e)**2.
-            tmpidx = np.where(ell<1)[0]
-
-            summ.append(sum(data[tmpidx]))
-            if counter: norm_increase.append((summ[counter]-summ[counter-1])/summ[counter-1])
-            npix.append(len(tmpidx))
-        maxidx = np.argmax(summ)
-
-        hidx = np.argmin(abs(summ[:maxidx]-summ[maxidx]/2.))
-        qre = np.arange(1,maxr)[hidx]
-        qnorm = summ[hidx]/npix[hidx]
-
-        # counter = 0
-        # tmpr = 1
-        # while True:
-        #     ell = ((xi-xc)*np.cos(to)+(yi-yc)*np.sin(to))**2./tmpr**2 + ((xi-xc)*np.sin(to)-(yi-yc)*np.cos(to))**2./(tmpr*e)**2.
+        # for counter, i in enumerate(np.arange(1,maxr)):
+        #     # b = i*np.sqrt(1-e**2)
+        #     # ell = ((xi-xc)*np.cos(to)+(yi-yc)*np.sin(to))**2./i**2 + ((xi-xc)*np.sin(to)-(yi-yc)*np.cos(to))**2./(b)**2.
+        #     ell = ((xi-xc)*np.cos(to)+(yi-yc)*np.sin(to))**2./i**2 + ((xi-xc)*np.sin(to)-(yi-yc)*np.cos(to))**2./(i*e)**2.
         #     tmpidx = np.where(ell<1)[0]
         #
         #     summ.append(sum(data[tmpidx]))
+        #     if counter: norm_increase.append((summ[counter]-summ[counter-1])/summ[counter-1])
         #     npix.append(len(tmpidx))
-        #     if counter:
-        #         norm_increase.append((summ[counter]-summ[counter-1])/summ[counter-1]) #summ[counter-1])
+        # maxidx = np.argmax(summ)
         #
-        #         if (norm_increase[counter-1]<0.025 and summ[counter]/sum(data)>0.4) or tmpr>maxr:
-        #             maxidx = np.argmax(summ)
-        #             hidx = np.argmin(abs(summ[:maxidx]-summ[maxidx]/2.))
-        #             qre = np.arange(1,maxr)[hidx]
-        #             qnorm = summ[hidx]/npix[hidx]
-        #             break
-        #     tmpr += 1
-        #     counter += 1
+        # hidx = np.argmin(abs(summ[:maxidx]-summ[maxidx]/2.))
+        # qre = np.arange(1,maxr)[hidx]
+        # qnorm = summ[hidx]/npix[hidx]
+
+        counter = 0
+        tmpr = 1
+        while True:
+            ell = ((xi-xc)*np.cos(to)+(yi-yc)*np.sin(to))**2./tmpr**2 + ((xi-xc)*np.sin(to)-(yi-yc)*np.cos(to))**2./(tmpr*e)**2.
+            tmpidx = np.where(ell<1)[0]
+
+            summ.append(sum(data[tmpidx]))
+            npix.append(len(tmpidx))
+            if counter:
+                norm_increase.append((summ[counter]-summ[counter-1])/summ[counter-1]) #summ[counter-1])
+
+                if (norm_increase[counter-1]<0.025 and summ[counter]/sum(data)>0.4) or tmpr>maxr:
+                    maxidx = np.argmax(summ)
+                    hidx = np.argmin(abs(summ[:maxidx]-summ[maxidx]/2.))
+                    qre = np.arange(1,maxr)[hidx]
+                    qnorm = summ[hidx]/npix[hidx]
+                    break
+            tmpr += 1
+            counter += 1
 
         # fig = plt.figure(figsize=(6,4))
         # ax = fig.add_subplot(1,1,1)
