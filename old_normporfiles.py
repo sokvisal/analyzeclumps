@@ -775,7 +775,7 @@ def coadd_profile(prop, phot_vars, zphot):
 
         dnorm = np.log10(dmask/norm)
         rnorm = np.log10(r/re)
-        re2idx = _re_cutoff(dnorm, 4*re)
+        re2idx = _re_cutoff(dnorm, 3*re)
 
         sfrnorm = norm_sfrd(lsfr, re)
         ssfr = 10**(lsfr[~np.isnan(lsfr)].ravel()-m[~np.isnan(m)].ravel())
@@ -796,7 +796,7 @@ def coadd_profile(prop, phot_vars, zphot):
 
         dnorm = np.log10(dmask/norm)
         rnorm = np.log10(r/re)
-        re2idx = _re_cutoff(dnorm,  4*re)
+        re2idx = _re_cutoff(dnorm,  3*re)
 
         if not i:
             angdist = angular_distance(zphot)
