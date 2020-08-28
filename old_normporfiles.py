@@ -645,7 +645,7 @@ def coadd_profile(prop, phot_vars, zphot):
             maxr = a*0.6
         else:
             maxr = a*0.6 #int(a*2)
-        maxr = a
+        maxr = a*0.8
 
         # for counter, i in enumerate(np.arange(1,maxr)):
         #     # b = i*np.sqrt(1-e**2)
@@ -695,18 +695,18 @@ def coadd_profile(prop, phot_vars, zphot):
             tmpr += 1
             counter += 1
 
-        # fig = plt.figure(figsize=(6,4))
-        # ax = fig.add_subplot(1,1,1)
-        # ax2 = ax.twinx()
+        fig = plt.figure(figsize=(6,4))
+        ax = fig.add_subplot(1,1,1)
+        ax2 = ax.twinx()
 
-        # ax.scatter(np.arange(1,len(summ)+1), summ)
-        # # ax.axvline(x=maxidx)
-        # ax.axvline(x=qre, linestyle=':', color='grey')
-        #
-        # ax2.scatter(np.arange(2,len(summ)+1), norm_increase, color='tab:red')
-        # ax2.set_ylim([-0.05, 0.55])
-        # ax2.axhline(y=0.05, linestyle=':', color='grey')
-        # plt.show()
+        ax.scatter(np.arange(1,len(summ)+1), summ)
+        # ax.axvline(x=maxidx)
+        ax.axvline(x=qre, linestyle=':', color='grey')
+
+        ax2.scatter(np.arange(2,len(summ)+1), norm_increase, color='tab:red')
+        ax2.set_ylim([-0.05, 0.55])
+        ax2.axhline(y=0.05, linestyle=':', color='grey')
+        plt.show()
 
         return qnorm, qre
 
