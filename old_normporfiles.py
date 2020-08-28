@@ -641,12 +641,7 @@ def coadd_profile(prop, phot_vars, zphot):
         norm_increase = []
         npix = []
 
-        if mass:
-            maxr = a*0.6
-        else:
-            maxr = a*0.6 #int(a*2)
-        maxr = a*0.8
-
+        # maxr = a*0.6
         # for counter, i in enumerate(np.arange(1,maxr)):
         #     # b = i*np.sqrt(1-e**2)
         #     # ell = ((xi-xc)*np.cos(to)+(yi-yc)*np.sin(to))**2./i**2 + ((xi-xc)*np.sin(to)-(yi-yc)*np.cos(to))**2./(b)**2.
@@ -667,6 +662,7 @@ def coadd_profile(prop, phot_vars, zphot):
         tmpy = np.ravel(tmpy)
         tmpx = np.ravel(tmpx)
 
+        maxr = a
         counter = 0
         tmpr = 1
         while True:
@@ -676,9 +672,9 @@ def coadd_profile(prop, phot_vars, zphot):
             summ.append(np.nansum(data[tmpidx]))
             npix.append(len(tmpidx))
             if counter:
-                norm_increase.append((summ[counter]-summ[counter-1])/summ[counter-1]) #summ[counter-1])
+                norm_increase.append((summ[counter])/summ[counter-1]-1 ) #summ[counter-1])
 
-                if (norm_increase[counter-1]<0.05 and summ[counter]/np.nansum(data)>0.4) or tmpr>maxr or np.isnan(data[tmpidx]).any(): #(norm_increase[counter-1]<0.05 and summ[counter]/np.nansum(data)>0.4) or tmpr>maxr or
+                if (norm_increase[counter-1]<0.05 and tmpr>a*0.6) or tmpr>maxr or np.isnan(data[tmpidx]).any(): #(norm_increase[counter-1]<0.05 and summ[counter]/np.nansum(data)>0.4) or tmpr>maxr or
                     maxidx = np.argmax(summ)
                     hidx = np.argmin(abs(summ[:maxidx]-summ[maxidx]/2.))
                     qre = np.arange(1,maxr)[hidx]
@@ -695,18 +691,20 @@ def coadd_profile(prop, phot_vars, zphot):
             tmpr += 1
             counter += 1
 
-        fig = plt.figure(figsize=(6,4))
-        ax = fig.add_subplot(1,1,1)
-        ax2 = ax.twinx()
-
-        ax.scatter(np.arange(1,len(summ)+1), summ)
-        # ax.axvline(x=maxidx)
-        ax.axvline(x=qre, linestyle=':', color='grey')
-
-        ax2.scatter(np.arange(2,len(summ)+1), norm_increase, color='tab:red')
-        ax2.set_ylim([-0.05, 0.55])
-        ax2.axhline(y=0.05, linestyle=':', color='grey')
-        plt.show()
+        # fig = plt.figure(figsize=(6,4))
+        # ax = fig.add_subplot(1,1,1)
+        # ax2 = ax.twinx()
+        #
+        # ax.scatter(np.arange(1,len(summ)+1), summ)
+        # # ax.axvline(x=maxidx)
+        # ax.axvline(x=a*0.6, color='grey')
+        # ax.axvline(x=qre, linestyle=':', color='grey')
+        # ax.axhline(y=summ[maxidx]/2., linestyle=':', color='grey')
+        #
+        # ax2.scatter(np.arange(2,len(summ)+1), norm_increase, color='tab:red')
+        # ax2.set_ylim([-0.05, 0.55])
+        # ax2.axhline(y=0.05, linestyle=':', color='grey')
+        # plt.show()
 
         return qnorm, qre
 
