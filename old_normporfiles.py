@@ -596,7 +596,7 @@ def coadd_profile(prop, phot_vars, zphot):
         # print (mode(myround(theta.ravel()))[0][0],  max(myround(r.ravel(), 2)), mode(myround(r.ravel(), 2))[0][0] )
         # return np.deg2rad(mode(myround(theta.ravel()))[0][0]), max(myround(r.ravel(), 2)), mode(myround(r.ravel(), 2))[0][0]
 
-        return np.deg2rad(mode(myround(theta.ravel()))[0][0]), percentile, mode(myround(r.ravel(), 2))[0][0]
+        return np.deg2rad(mode(myround(theta.ravel()))[0][0]), max(r[r.ravel()<percentile]), mode(myround(r.ravel(), 2))[0][0]
 
     def ellipses(a, b, to):
         # to = np.deg2rad(to)
@@ -639,55 +639,55 @@ def coadd_profile(prop, phot_vars, zphot):
         norm_increase = []
         npix = []
 
-        maxr = a*0.4
-        for counter, i in enumerate(np.arange(1,maxr)):
-            # b = i*np.sqrt(1-e**2)
-            # ell = ((xi-xc)*np.cos(to)+(yi-yc)*np.sin(to))**2./i**2 + ((xi-xc)*np.sin(to)-(yi-yc)*np.cos(to))**2./(b)**2.
-            ell = ((xi-xc)*np.cos(to)+(yi-yc)*np.sin(to))**2./i**2 + ((xi-xc)*np.sin(to)-(yi-yc)*np.cos(to))**2./(i*e)**2.
-            tmpidx = np.where(ell<1)[0]
-
-            summ.append(sum(data[tmpidx]))
-            if counter: norm_increase.append((summ[counter]-summ[counter-1])/summ[counter-1])
-            npix.append(len(tmpidx))
-        maxidx = np.argmax(summ)
-
-        hidx = np.argmin(abs(summ[:maxidx]-summ[maxidx]/2.))
-        qre = np.arange(1,maxr)[hidx]
-        qnorm = summ[hidx]/npix[hidx]
-
-        # data = img.ravel()
-        # tmpy, tmpx = np.indices(img.shape)
-        # tmpy = np.ravel(tmpy)
-        # tmpx = np.ravel(tmpx)
-        #
-        # maxr = a
-        # counter = 0
-        # tmpr = 1
-        # while True:
-        #     ell = ((tmpx-xc)*np.cos(to)+(tmpy-yc)*np.sin(to))**2./tmpr**2 + ((tmpx-xc)*np.sin(to)-(tmpy-yc)*np.cos(to))**2./(tmpr*e)**2.
+        # maxr = a*0.6
+        # for counter, i in enumerate(np.arange(1,maxr)):
+        #     # b = i*np.sqrt(1-e**2)
+        #     # ell = ((xi-xc)*np.cos(to)+(yi-yc)*np.sin(to))**2./i**2 + ((xi-xc)*np.sin(to)-(yi-yc)*np.cos(to))**2./(b)**2.
+        #     ell = ((xi-xc)*np.cos(to)+(yi-yc)*np.sin(to))**2./i**2 + ((xi-xc)*np.sin(to)-(yi-yc)*np.cos(to))**2./(i*e)**2.
         #     tmpidx = np.where(ell<1)[0]
         #
-        #     summ.append(np.nansum(data[tmpidx]))
+        #     summ.append(sum(data[tmpidx]))
+        #     if counter: norm_increase.append((summ[counter]-summ[counter-1])/summ[counter-1])
         #     npix.append(len(tmpidx))
-        #     if counter:
-        #         norm_increase.append((summ[counter])/summ[counter-1]-1 ) #summ[counter-1])
+        # maxidx = np.argmax(summ)
         #
-        #         if (norm_increase[counter-1]<0.05 and tmpr+1>a*0.6) or tmpr>maxr or np.isnan(data[tmpidx]).any(): #(norm_increase[counter-1]<0.05 and summ[counter]/np.nansum(data)>0.4) or tmpr>maxr or
-        #             maxidx = np.argmax(summ)
-        #             hidx = np.argmin(abs(summ[:maxidx]-summ[maxidx]/2.))
-        #             qre = np.arange(1,maxr)[hidx]
-        #             qnorm = summ[hidx]/npix[hidx]
-        #
-        #             # ell_h, ell_f  = ellipses(maxidx, e*maxidx, to)
-        #             # plt.scatter(tmpx[tmpidx], tmpy[tmpidx])
-        #             # plt.plot(xc+ell_h[0,:], yc+ell_h[1,:], color="tab:red", linewidth=2)
-        #             # plt.xlim([0,156])
-        #             # plt.ylim([0,156])
-        #             # plt.gca().set_aspect(1)
-        #             # plt.show()
-        #             break
-        #     tmpr += 1
-        #     counter += 1
+        # hidx = np.argmin(abs(summ[:maxidx]-summ[maxidx]/2.))
+        # qre = np.arange(1,maxr)[hidx]
+        # qnorm = summ[hidx]/npix[hidx]
+
+        data = img.ravel()
+        tmpy, tmpx = np.indices(img.shape)
+        tmpy = np.ravel(tmpy)
+        tmpx = np.ravel(tmpx)
+
+        maxr = a
+        counter = 0
+        tmpr = 1
+        while True:
+            ell = ((tmpx-xc)*np.cos(to)+(tmpy-yc)*np.sin(to))**2./tmpr**2 + ((tmpx-xc)*np.sin(to)-(tmpy-yc)*np.cos(to))**2./(tmpr*e)**2.
+            tmpidx = np.where(ell<1)[0]
+
+            summ.append(np.nansum(data[tmpidx]))
+            npix.append(len(tmpidx))
+            if counter:
+                norm_increase.append((summ[counter])/summ[counter-1]-1 ) #summ[counter-1])
+
+                if (norm_increase[counter-1]<0.05 and tmpr+1>a*0.6) or tmpr>maxr or np.isnan(data[tmpidx]).any(): #(norm_increase[counter-1]<0.05 and summ[counter]/np.nansum(data)>0.4) or tmpr>maxr or
+                    maxidx = np.argmax(summ)
+                    hidx = np.argmin(abs(summ[:maxidx]-summ[maxidx]/2.))
+                    qre = np.arange(1,maxr)[hidx]
+                    qnorm = summ[hidx]/npix[hidx]
+
+                    # ell_h, ell_f  = ellipses(maxidx, e*maxidx, to)
+                    # plt.scatter(tmpx[tmpidx], tmpy[tmpidx])
+                    # plt.plot(xc+ell_h[0,:], yc+ell_h[1,:], color="tab:red", linewidth=2)
+                    # plt.xlim([0,156])
+                    # plt.ylim([0,156])
+                    # plt.gca().set_aspect(1)
+                    # plt.show()
+                    break
+            tmpr += 1
+            counter += 1
 
         # fig = plt.figure(figsize=(6,4))
         # ax = fig.add_subplot(1,1,1)
