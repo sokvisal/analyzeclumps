@@ -639,7 +639,7 @@ def coadd_profile(prop, phot_vars, zphot):
         norm_increase = []
         npix = []
 
-        maxr = a*0.6
+        maxr = a*0.5
         for counter, i in enumerate(np.arange(1,maxr)):
             # b = i*np.sqrt(1-e**2)
             # ell = ((xi-xc)*np.cos(to)+(yi-yc)*np.sin(to))**2./i**2 + ((xi-xc)*np.sin(to)-(yi-yc)*np.cos(to))**2./(b)**2.
