@@ -637,6 +637,7 @@ def coadd_profile(prop, phot_vars, zphot):
         Set mass to True if working with half-mass radius
         '''
         summ = []
+        increase = []
         norm_increase = []
         npix = []
 
@@ -661,6 +662,10 @@ def coadd_profile(prop, phot_vars, zphot):
         tmpy = np.ravel(tmpy)
         tmpx = np.ravel(tmpx)
 
+        ell = ((tmpx-xc)*np.cos(to)+(tmpy-yc)*np.sin(to))**2./a**2 + ((tmpx-xc)*np.sin(to)-(tmpy-yc)*np.cos(to))**2./(a*e)**2.
+        tmpidx = np.where(ell<1)[0]
+        maxflux = np.nansum(data[tmpidx])
+
         maxr = a
         counter = 0
         tmpr = 1
@@ -669,10 +674,13 @@ def coadd_profile(prop, phot_vars, zphot):
             tmpidx = np.where(ell<1)[0]
 
             summ.append(np.nansum(data[tmpidx]))
+
             npix.append(len(tmpidx))
             if counter:
-                norm_increase.append((summ[counter])/summ[counter-1]-1 ) #summ[counter-1])
-                if (norm_increase[counter-1]<0.02 and tmpr+1>a*0.6):
+                increase.append(summ[counter]-summ[counter-1])
+                norm_increase.append((summ[counter]-summ[counter-1])/maxflux) #summ[counter-1])
+                # print (np.mean(np.array(norm_increase)[-5:]))
+                if norm_increase[counter-1]<0.025 and tmpr+1>a*0.6: #norm_increase[counter-1]<0.02 and tmpr+1>a*0.6)
                     maxidx = np.argmax(summ)
                     hidx = np.argmin(abs(summ[:maxidx]-summ[maxidx]/2.))
                     qre = np.arange(1,maxr)[hidx]
@@ -706,7 +714,7 @@ def coadd_profile(prop, phot_vars, zphot):
         # # ax.axhline(y=summ[maxidx]/2., linestyle=':', color='grey')
         #
         # ax2.scatter(np.arange(2,len(summ)+1), norm_increase, color='tab:red')
-        # ax2.set_ylim([-0.05, 0.55])
+        # # ax2.set_ylim([-0.05, 0.55])
         # ax2.axhline(y=0.025, linestyle=':', color='grey')
         # plt.show()
 
