@@ -672,7 +672,7 @@ def coadd_profile(prop, phot_vars, zphot):
             npix.append(len(tmpidx))
             if counter:
                 norm_increase.append((summ[counter])/summ[counter-1]-1 ) #summ[counter-1])
-                if (norm_increase[counter-1]<0.025 and tmpr+1>a*0.6): #(norm_increase[counter-1]<0.05 and summ[counter]/np.nansum(data)>0.4) or tmpr>maxr or
+                if (norm_increase[counter-1]<0.025 and tmpr+1>a*0.5):
                     maxidx = np.argmax(summ)
                     hidx = np.argmin(abs(summ[:maxidx]-summ[maxidx]/2.))
                     qre = np.arange(1,maxr)[hidx]
@@ -686,7 +686,7 @@ def coadd_profile(prop, phot_vars, zphot):
                     # plt.gca().set_aspect(1)
                     # plt.show()
                     break
-                elif tmpr>maxr or np.isnan(data[tmpidx]).any(): #(norm_increase[counter-1]<0.05 and summ[counter]/np.nansum(data)>0.4) or tmpr>maxr or
+                elif tmpr>maxr or np.isnan(data[tmpidx]).any():
                     # maxidx = tmpr #np.argmax(summ)
                     qre = tmpr/2 #np.arange(1,maxr)[hidx]
                     hidx = np.argmin(abs(np.arange(1,maxr)-qre))
