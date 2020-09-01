@@ -674,13 +674,12 @@ def coadd_profile(prop, phot_vars, zphot):
             tmpidx = np.where(ell<1)[0]
 
             summ.append(np.nansum(data[tmpidx]))
-
             npix.append(len(tmpidx))
             if counter:
                 increase.append(summ[counter]-summ[counter-1])
-                norm_increase.append((summ[counter]-summ[counter-1])/maxflux) #summ[counter-1])
+                norm_increase.append((summ[counter]/maxflux)) #summ[counter-1])
                 # print (np.mean(np.array(norm_increase)[-5:]))
-                if norm_increase[counter-1]<0.025 and tmpr+1>a*0.6: #norm_increase[counter-1]<0.02 and tmpr+1>a*0.6)
+                if norm_increase[counter-1]>0.75 and tmpr+1>a*0.5: #norm_increase[counter-1]<0.02 and tmpr+1>a*0.6)
                     maxidx = np.argmax(summ)
                     hidx = np.argmin(abs(summ[:maxidx]-summ[maxidx]/2.))
                     qre = np.arange(1,maxr)[hidx]
@@ -695,13 +694,14 @@ def coadd_profile(prop, phot_vars, zphot):
                     # plt.show()
                     break
                 elif tmpr>maxr or np.isnan(data[tmpidx]).any():
-                    # maxidx = tmpr #np.argmax(summ)
                     qre = tmpr/2 #np.arange(1,maxr)[hidx]
                     hidx = np.argmin(abs(np.arange(1,maxr)-qre))
                     qnorm = summ[hidx]/npix[hidx]
                     break
+
             tmpr += 1
             counter += 1
+
 
         # fig = plt.figure(figsize=(6,4))
         # ax = fig.add_subplot(1,1,1)
@@ -709,12 +709,12 @@ def coadd_profile(prop, phot_vars, zphot):
         #
         # ax.scatter(np.arange(1,len(summ)+1), summ)
         # # ax.axvline(x=maxidx)
-        # ax.axvline(x=a*0.6, color='grey')
-        # ax.axvline(x=qre, linestyle=':', color='grey')
+        # ax.axvline(x=a*0.5, color='grey')
+        # ax.axvline(x=qre, linestyle='--', color='grey')
         # # ax.axhline(y=summ[maxidx]/2., linestyle=':', color='grey')
         #
         # ax2.scatter(np.arange(2,len(summ)+1), norm_increase, color='tab:red')
-        # # ax2.set_ylim([-0.05, 0.55])
+        # # ax2.set_ylim([-0.01, 0.51])
         # ax2.axhline(y=0.025, linestyle=':', color='grey')
         # plt.show()
 
