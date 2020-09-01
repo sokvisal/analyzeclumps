@@ -679,7 +679,7 @@ def coadd_profile(prop, phot_vars, zphot):
                 increase.append(summ[counter]-summ[counter-1])
                 norm_increase.append((summ[counter]/maxflux)) #summ[counter-1])
                 # print (np.mean(np.array(norm_increase)[-5:]))
-                if norm_increase[counter-1]>0.75 and tmpr+1>a*0.5: #norm_increase[counter-1]<0.02 and tmpr+1>a*0.6)
+                if norm_increase[counter-1]>0.7 and tmpr+1>a*0.4: #norm_increase[counter-1]<0.02 and tmpr+1>a*0.6)
                     maxidx = np.argmax(summ)
                     hidx = np.argmin(abs(summ[:maxidx]-summ[maxidx]/2.))
                     qre = np.arange(1,maxr)[hidx]
@@ -703,20 +703,20 @@ def coadd_profile(prop, phot_vars, zphot):
             counter += 1
 
 
-        # fig = plt.figure(figsize=(6,4))
-        # ax = fig.add_subplot(1,1,1)
-        # ax2 = ax.twinx()
-        #
-        # ax.scatter(np.arange(1,len(summ)+1), summ)
-        # # ax.axvline(x=maxidx)
-        # ax.axvline(x=a*0.5, color='grey')
-        # ax.axvline(x=qre, linestyle='--', color='grey')
-        # # ax.axhline(y=summ[maxidx]/2., linestyle=':', color='grey')
-        #
-        # ax2.scatter(np.arange(2,len(summ)+1), norm_increase, color='tab:red')
-        # # ax2.set_ylim([-0.01, 0.51])
-        # ax2.axhline(y=0.025, linestyle=':', color='grey')
-        # plt.show()
+        fig = plt.figure(figsize=(6,4))
+        ax = fig.add_subplot(1,1,1)
+        ax2 = ax.twinx()
+
+        ax.scatter(np.arange(1,len(summ)+1), summ/maxflux)
+        # ax.axvline(x=maxidx)
+        ax.axvline(x=a*0.5, color='grey')
+        ax.axvline(x=qre, linestyle='--', color='grey')
+        # ax.axhline(y=summ[maxidx]/2., linestyle=':', color='grey')
+
+        ax2.scatter(np.arange(2,len(summ)+1), increase, color='tab:red')
+        # ax2.set_ylim([-0.01, 0.51])
+        ax2.axhline(y=0.025, linestyle=':', color='grey')
+        plt.show()
 
         return qnorm, qre
 
