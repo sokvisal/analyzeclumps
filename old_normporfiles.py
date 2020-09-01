@@ -641,21 +641,23 @@ def coadd_profile(prop, phot_vars, zphot):
         norm_increase = []
         npix = []
 
-        # maxr = a*0.5
-        # for counter, i in enumerate(np.arange(1,maxr)):
-        #     # b = i*np.sqrt(1-e**2)
-        #     # ell = ((xi-xc)*np.cos(to)+(yi-yc)*np.sin(to))**2./i**2 + ((xi-xc)*np.sin(to)-(yi-yc)*np.cos(to))**2./(b)**2.
-        #     ell = ((xi-xc)*np.cos(to)+(yi-yc)*np.sin(to))**2./i**2 + ((xi-xc)*np.sin(to)-(yi-yc)*np.cos(to))**2./(i*e)**2.
-        #     tmpidx = np.where(ell<1)[0]
-        #
-        #     summ.append(sum(data[tmpidx]))
-        #     if counter: norm_increase.append((summ[counter]-summ[counter-1])/summ[counter-1])
-        #     npix.append(len(tmpidx))
-        # maxidx = np.argmax(summ)
-        #
-        # hidx = np.argmin(abs(summ[:maxidx]-summ[maxidx]/2.))
-        # qre = np.arange(1,maxr)[hidx]
-        # qnorm = summ[hidx]/npix[hidx]
+        maxr = a*0.5
+        for counter, i in enumerate(np.arange(1,maxr)):
+            # b = i*np.sqrt(1-e**2)
+            # ell = ((xi-xc)*np.cos(to)+(yi-yc)*np.sin(to))**2./i**2 + ((xi-xc)*np.sin(to)-(yi-yc)*np.cos(to))**2./(b)**2.
+            ell = ((xi-xc)*np.cos(to)+(yi-yc)*np.sin(to))**2./i**2 + ((xi-xc)*np.sin(to)-(yi-yc)*np.cos(to))**2./(i*e)**2.
+            tmpidx = np.where(ell<1)[0]
+
+            summ.append(sum(data[tmpidx]))
+            if counter:
+                increase.append(summ[counter]-summ[counter-1])
+                norm_increase.append((summ[counter]-summ[counter-1])/summ[counter-1])
+            npix.append(len(tmpidx))
+        maxidx = np.argmax(summ)
+
+        hidx = np.argmin(abs(summ[:maxidx]-summ[maxidx]/2.))
+        qre = np.arange(1,maxr)[hidx]
+        qnorm = summ[hidx]/npix[hidx]
 
         data = img.ravel()
         tmpy, tmpx = np.indices(img.shape)
@@ -666,57 +668,56 @@ def coadd_profile(prop, phot_vars, zphot):
         tmpidx = np.where(ell<1)[0]
         maxflux = np.nansum(data[tmpidx])
 
-        maxr = a
-        counter = 0
-        tmpr = 1
-        while True:
-            ell = ((tmpx-xc)*np.cos(to)+(tmpy-yc)*np.sin(to))**2./tmpr**2 + ((tmpx-xc)*np.sin(to)-(tmpy-yc)*np.cos(to))**2./(tmpr*e)**2.
-            tmpidx = np.where(ell<1)[0]
+        # maxr = a
+        # counter = 0
+        # tmpr = 1
+        # while True:
+        #     ell = ((tmpx-xc)*np.cos(to)+(tmpy-yc)*np.sin(to))**2./tmpr**2 + ((tmpx-xc)*np.sin(to)-(tmpy-yc)*np.cos(to))**2./(tmpr*e)**2.
+        #     tmpidx = np.where(ell<1)[0]
+        #
+        #     summ.append(np.nansum(data[tmpidx]))
+        #     npix.append(len(tmpidx))
+        #     if counter:
+        #         increase.append(summ[counter]-summ[counter-1])
+        #         norm_increase.append((summ[counter]/maxflux)) #summ[counter-1])
+        #         # print (np.mean(np.array(norm_increase)[-5:]))
+        #         if norm_increase[counter-1]>0.7 and tmpr+1>a*0.4: #norm_increase[counter-1]<0.02 and tmpr+1>a*0.6)
+        #             maxidx = np.argmax(summ)
+        #             hidx = np.argmin(abs(summ[:maxidx]-summ[maxidx]/2.))
+        #             qre = np.arange(1,maxr)[hidx]
+        #             qnorm = summ[hidx]/npix[hidx]
+        #
+        #             # ell_h, ell_f  = ellipses(maxidx, e*maxidx, to)
+        #             # plt.scatter(tmpx[tmpidx], tmpy[tmpidx])
+        #             # plt.plot(xc+ell_h[0,:], yc+ell_h[1,:], color="tab:red", linewidth=2)
+        #             # plt.xlim([0,156])
+        #             # plt.ylim([0,156])
+        #             # plt.gca().set_aspect(1)
+        #             # plt.show()
+        #             break
+        #         elif tmpr>maxr or np.isnan(data[tmpidx]).any():
+        #             qre = tmpr/2 #np.arange(1,maxr)[hidx]
+        #             hidx = np.argmin(abs(np.arange(1,maxr)-qre))
+        #             qnorm = summ[hidx]/npix[hidx]
+        #             break
+        #
+        #     tmpr += 1
+        #     counter += 1
 
-            summ.append(np.nansum(data[tmpidx]))
-            npix.append(len(tmpidx))
-            if counter:
-                increase.append(summ[counter]-summ[counter-1])
-                norm_increase.append((summ[counter]/maxflux)) #summ[counter-1])
-                # print (np.mean(np.array(norm_increase)[-5:]))
-                if norm_increase[counter-1]>0.7 and tmpr+1>a*0.4: #norm_increase[counter-1]<0.02 and tmpr+1>a*0.6)
-                    maxidx = np.argmax(summ)
-                    hidx = np.argmin(abs(summ[:maxidx]-summ[maxidx]/2.))
-                    qre = np.arange(1,maxr)[hidx]
-                    qnorm = summ[hidx]/npix[hidx]
-
-                    # ell_h, ell_f  = ellipses(maxidx, e*maxidx, to)
-                    # plt.scatter(tmpx[tmpidx], tmpy[tmpidx])
-                    # plt.plot(xc+ell_h[0,:], yc+ell_h[1,:], color="tab:red", linewidth=2)
-                    # plt.xlim([0,156])
-                    # plt.ylim([0,156])
-                    # plt.gca().set_aspect(1)
-                    # plt.show()
-                    break
-                elif tmpr>maxr or np.isnan(data[tmpidx]).any():
-                    qre = tmpr/2 #np.arange(1,maxr)[hidx]
-                    hidx = np.argmin(abs(np.arange(1,maxr)-qre))
-                    qnorm = summ[hidx]/npix[hidx]
-                    break
-
-            tmpr += 1
-            counter += 1
-
-
-        fig = plt.figure(figsize=(6,4))
-        ax = fig.add_subplot(1,1,1)
-        ax2 = ax.twinx()
-
-        ax.scatter(np.arange(1,len(summ)+1), summ/maxflux)
-        # ax.axvline(x=maxidx)
-        ax.axvline(x=a*0.5, color='grey')
-        ax.axvline(x=qre, linestyle='--', color='grey')
-        # ax.axhline(y=summ[maxidx]/2., linestyle=':', color='grey')
-
-        ax2.scatter(np.arange(2,len(summ)+1), increase, color='tab:red')
-        # ax2.set_ylim([-0.01, 0.51])
-        ax2.axhline(y=0.025, linestyle=':', color='grey')
-        plt.show()
+        # fig = plt.figure(figsize=(6,4))
+        # ax = fig.add_subplot(1,1,1)
+        # ax2 = ax.twinx()
+        #
+        # ax.scatter(np.arange(1,len(summ)+1), summ)
+        # # ax.axvline(x=maxidx)
+        # ax.axvline(x=a*0.5, color='grey')
+        # ax.axvline(x=qre, linestyle='--', color='grey')
+        # # ax.axhline(y=summ[maxidx]/2., linestyle=':', color='grey')
+        #
+        # ax2.scatter(np.arange(2,len(summ)+1), increase, color='tab:red')
+        # # ax2.set_ylim([-0.01, 0.51])
+        # ax2.axhline(y=0.025, linestyle=':', color='grey')
+        # plt.show()
 
         return qnorm, qre
 
