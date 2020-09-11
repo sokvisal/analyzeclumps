@@ -13,27 +13,27 @@ def fit(path, tile):
     for i in tqdm(directories[50:]):
 
         if os.path.isdir(i+'/test_phot'):
-            for dir in glob.glob('../analyzeclumps/sedfiles/*.param'):
-                shutil.copyfile(dir, i+'/test_phot/{}'.format(os.path.basename(dir)))
-            if os.path.islink(i+'/test_phot/templates'): os.unlink(i+'/test_phot/templates')
-            os.system('ln -s {}/sedfiles/templates {}/test_phot/templates'.format(script_dir, i))
+            # for dir in glob.glob('../analyzeclumps/sedfiles/*.param'):
+            #     shutil.copyfile(dir, i+'/test_phot/{}'.format(os.path.basename(dir)))
+            # if os.path.islink(i+'/test_phot/templates'): os.unlink(i+'/test_phot/templates')
+            # os.system('ln -s {}/sedfiles/templates {}/test_phot/templates'.format(script_dir, i))
             if os.path.isdir(i+'/test_phot/OUTPUT'):  shutil.rmtree(i+'/test_phot/OUTPUT')
             os.makedirs(i+'/test_phot/OUTPUT')
 
         if os.path.isfile(i+'/test_phot/cosmos.cat'):
             os.chdir(i+'/test_phot/')
 
-            # zphotparams = ['zphot_2800-u.param', 'zphot_u-v.param']
-            # for param in zphotparams:
-            #     shutil.copyfile(param, 'zphot.param')
-            #     ezycmd = ['/home/astro/sok/.local/eazy-photoz/src/eazy', 'zphot.param']
-            #
-            #     f = open('eazy.log', 'w')
-            #     subprocess.call(ezycmd, stdout=f)
+            zphotparams = ['zphot_2800-u.param', 'zphot_u-v.param']
+            for param in zphotparams:
+                shutil.copyfile(param, 'zphot.param')
+                ezycmd = ['/home/astro/sok/.local/eazy-photoz/src/eazy', 'zphot.param']
 
-            cmd = ['/home/astro/sok/.local/fastpp/bin/fast++', 'fast.param']
-            f = open('fast.log', 'w')
-            subprocess.call(cmd)
+                f = open('eazy.log', 'w')
+                subprocess.call(ezycmd, stdout=f)
+
+            # cmd = ['/home/astro/sok/.local/fastpp/bin/fast++', 'fast.param']
+            # f = open('fast.log', 'w')
+            # subprocess.call(cmd)
 
             os.chdir(wdir)
         else:
