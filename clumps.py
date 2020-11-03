@@ -137,13 +137,17 @@ def stellarPopMaps(directory, path):
         # umag[umag==-99.] = 1e-10
         # vmag[vmag==-99.] = 1e-10
 
-        binmap = np.ones((size,size))
+        binmap = np.ones((2,size,size))
         tmpvars = np.zeros((1,size,size))*np.nan
         physvars = np.zeros((3,size,size))*np.nan
         photvars = np.zeros((3,size,size))*np.nan
 
         maxflux = np.max(sNIR)
         minflux = np.min(sNIR)
+
+        znormNIR = (sNIR-min(sNIR))/(max(sNIR)-min(sNIR))
+        znormUV = (surest-min(surest))/(max(surest)-min(surest))
+        znormV = (svrest-min(svrest))/(max(svrest)-min(svrest))
 
         binshape = []
         for i, binid in enumerate(binids):
@@ -154,23 +158,20 @@ def stellarPopMaps(directory, path):
             coords = zip(y[idx].astype(int),x[idx].astype(int))
             ny, nx = zip(*coords)
 
-            binmap[ny, nx] = binid
+            binmaps[0, ny, nx] = binid
+            binmaps[1, ny, nx] = np.sqrt(npix)
             normu = 1+(surest-np.mean(surest))/(np.max(surest)-np.min(surest))
             normv = 1+(svrest-np.mean(svrest))/(np.max(svrest)-np.min(svrest))
             normNIR = 1+(sNIR-np.mean(sNIR))/(np.max(sNIR)-np.min(sNIR))
-
-            znormNIR = (sNIR-min(sNIR))/(max(sNIR)-min(sNIR))
-            znormUV = (surest-min(surest))/(max(surest)-min(surest))
-            znormV = (svrest-min(svrest))/(max(svrest)-min(svrest))
 
             if not np.any(np.isnan([lm[i], l2800[i], umag[i], vmag[i]])):
                 ubinscale = 1+(np.mean(surest[idx])-np.mean(surest))/(np.max(surest)-np.min(surest))#surest[idx]/np.sum(surest[idx])#1+(surest[idx]-np.mean(surest[idx]))/(np.max(surest)-np.min(surest))
                 vbinscale = 1+(np.mean(svrest[idx])-np.mean(svrest))/(np.max(svrest)-np.min(svrest))#svrest[idx]/np.sum(svrest[idx])#1+(svrest[idx]-np.mean(svrest[idx]))/(np.max(svrest)-np.min(svrest))
                 nirscale = 1+(np.mean(sNIR[idx])-np.mean(sNIR))/(np.max(sNIR)-np.min(sNIR))
 
-                normIR =  znormNIR[idx].clip(0.025)/1.
-                normUV =  znormUV[idx].clip(0.025)/1.
-                normV =  znormV[idx].clip(0.025)/1.
+                normIR =  znormNIR[idx].clip(0.05)
+                normUV =  znormUV[idx].clip(0.05)
+                normV =  znormV[idx].clip(0.05)
                 Hscale = normH[i]/1.
 
                 scalemass = np.sum(10**lm[i]*normIR)/np.sum(10**lm[i]*npix)
@@ -234,9 +235,9 @@ def retrieved_maps(directories, path):
                 photvars *= segmap
                 # mass, params, normmaps, diagnostics, outerflux =\
                 #                 structparams.setup_profile([tmpyc, tmpxc], a, b, phi, physvars, photvars, zp)
-                mass, params, normmaps, diagnostics, res = old_normporfiles.coadd_profile(physvars, photvars, zp)
+                mass, params, normmaps, diagnostics, res = old_normporfiles.coadd_profile(physvars, photvars, zp, weighted_map=binmaps[1])
 
-                maps = [physvars[0], physvars[1], photvars[1], photvars[2], -2.5*np.log10(photvars[1]/photvars[2]), binmap]
+                maps = [physvars[0], physvars[1], photvars[1], photvars[2], -2.5*np.log10(photvars[1]/photvars[2]), binmaps]
                 galmass_idl, galmass_c, galsfr, hmag, bmag, zmag, umv = getMSFR(idnum)
 
                 selzp.append(zp)
