@@ -137,7 +137,7 @@ def stellarPopMaps(directory, path):
         # umag[umag==-99.] = 1e-10
         # vmag[vmag==-99.] = 1e-10
 
-        binmap = np.ones((2,size,size))
+        binmaps = np.ones((2,size,size))
         tmpvars = np.zeros((1,size,size))*np.nan
         physvars = np.zeros((3,size,size))*np.nan
         photvars = np.zeros((3,size,size))*np.nan
