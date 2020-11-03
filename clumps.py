@@ -189,7 +189,7 @@ def stellarPopMaps(directory, path):
 
         tmpvars[0][np.isnan(tmpvars[0])] = 0.
         tmpy, tmpx = np.unravel_index(np.argmax(tmpvars[0]), tmpvars[0].shape)
-        return [physvars, photvars, binmap, binshape], [tmpy, tmpx]
+        return [physvars, photvars, binmaps, binshape], [tmpy, tmpx]
 
 def retrieved_maps(directories, path):
 
@@ -228,7 +228,7 @@ def retrieved_maps(directories, path):
             if type(boolcheck) == type(True):
                 badcounts += 1
             elif np.sqrt(1-b**2/a**2)<0.8: # remove highly eccentric galaxies, maybe edge on galaxies?
-                physvars, photvars, binmap, binshape = boolcheck
+                physvars, photvars, binmaps, binshape = boolcheck
                 binshape = np.array(sorted(binshape, key=itemgetter(1))[:21])
 
                 physvars *= segmap
