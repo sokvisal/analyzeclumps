@@ -8,10 +8,16 @@ sys.path.insert(0, '../../scripts/')
 import misc
 import glob
 import diagnostics
+from photutils import EllipticalAperture, EllipticalAnnulus
+from photutils import aperture_photometry
+from astropy.table import hstack
 
 
 def caddnorm_plot(rgb_img, maps, normmaps, params, titleparams, res, show=False, savedir=False): # yi, xi, norm_r, norm_quan, uvmap
-    sm, sfr, lu, lv, uvrest, binmap = maps
+    sm, sfr, lu, lv, uvrest, binmaps = maps
+    binmap = binmaps[0]
+    weighted_map = binmaps[1]
+
     massNorm = normmaps[0]
     Norm2800 = normmaps[1]
     uNorm = normmaps[2]
@@ -478,7 +484,7 @@ def _return_cm(mass):
 
     return yi, xi, yc, xc, theta0, a, b
 
-def coadd_profile(prop, phot_vars, zphot):
+def coadd_profile(prop, phot_vars, zphot, weighted_map=None):
     '''
     This function create the co-added normalized profile. First the function finds the COM and distribution
     of mass in the galaxy. This is used to find the half-light/mass radius of the galaxy. The average value
@@ -624,102 +630,71 @@ def coadd_profile(prop, phot_vars, zphot):
     #w = stellar_mass.shape[0]
 
     to, a, b = galparams(stellar_mass)
-    print (a, b)
     e = b/a # axial ratio as defined by Wuyts12
     # e = np.sqrt(1-b**2/a**2)
     # print ('eccentricity', e, b/a)
     # e = mwb/mwa
 #     print 'gal params: ', to, mwb, mwa
     import matplotlib.pyplot as plt
-    def halflightR(data, img, mass=False):
+    def halflightR(data, img, mass=False, weighted_map=None):
         '''
         Return normalized array wrt half-light/half-mass radius
         Set mass to True if working with half-mass radius
         '''
-        summ = []
-        increase = []
-        norm_increase = []
-        npix = []
-
-        maxr = a*0.5
-        for counter, i in enumerate(np.arange(1,maxr)):
-            # b = i*np.sqrt(1-e**2)
-            # ell = ((xi-xc)*np.cos(to)+(yi-yc)*np.sin(to))**2./i**2 + ((xi-xc)*np.sin(to)-(yi-yc)*np.cos(to))**2./(b)**2.
-            ell = ((xi-xc)*np.cos(to)+(yi-yc)*np.sin(to))**2./i**2 + ((xi-xc)*np.sin(to)-(yi-yc)*np.cos(to))**2./(i*e)**2.
-            tmpidx = np.where(ell<1)[0]
-
-            summ.append(sum(data[tmpidx]))
-            if counter:
-                increase.append(summ[counter]-summ[counter-1])
-                norm_increase.append((summ[counter]-summ[counter-1])/summ[counter-1])
-            npix.append(len(tmpidx))
-        maxidx = np.argmax(summ)
-
-        hidx = np.argmin(abs(summ[:maxidx]-summ[maxidx]/2.))
-        qre = np.arange(1,maxr)[hidx]
-        qnorm = summ[hidx]/npix[hidx]
 
         data = img.ravel()
         tmpy, tmpx = np.indices(img.shape)
         tmpy = np.ravel(tmpy)
         tmpx = np.ravel(tmpx)
 
-        ell = ((tmpx-xc)*np.cos(to)+(tmpy-yc)*np.sin(to))**2./a**2 + ((tmpx-xc)*np.sin(to)-(tmpy-yc)*np.cos(to))**2./(a*e)**2.
-        tmpidx = np.where(ell<1)[0]
-        maxflux = np.nansum(data[tmpidx])
 
-        # maxr = a
-        # counter = 0
-        # tmpr = 1
-        # while True:
-        #     ell = ((tmpx-xc)*np.cos(to)+(tmpy-yc)*np.sin(to))**2./tmpr**2 + ((tmpx-xc)*np.sin(to)-(tmpy-yc)*np.cos(to))**2./(tmpr*e)**2.
-        #     tmpidx = np.where(ell<1)[0]
-        #
-        #     summ.append(np.nansum(data[tmpidx]))
-        #     npix.append(len(tmpidx))
-        #     if counter:
-        #         increase.append(summ[counter]-summ[counter-1])
-        #         norm_increase.append((summ[counter]/maxflux)) #summ[counter-1])
-        #         # print (np.mean(np.array(norm_increase)[-5:]))
-        #         if norm_increase[counter-1]>0.7 and tmpr+1>a*0.4: #norm_increase[counter-1]<0.02 and tmpr+1>a*0.6)
-        #             maxidx = np.argmax(summ)
-        #             hidx = np.argmin(abs(summ[:maxidx]-summ[maxidx]/2.))
-        #             qre = np.arange(1,maxr)[hidx]
-        #             qnorm = summ[hidx]/npix[hidx]
-        #
-        #             # ell_h, ell_f  = ellipses(maxidx, e*maxidx, to)
-        #             # plt.scatter(tmpx[tmpidx], tmpy[tmpidx])
-        #             # plt.plot(xc+ell_h[0,:], yc+ell_h[1,:], color="tab:red", linewidth=2)
-        #             # plt.xlim([0,156])
-        #             # plt.ylim([0,156])
-        #             # plt.gca().set_aspect(1)
-        #             # plt.show()
-        #             break
-        #         elif tmpr>maxr or np.isnan(data[tmpidx]).any():
-        #             qre = tmpr/2 #np.arange(1,maxr)[hidx]
-        #             hidx = np.argmin(abs(np.arange(1,maxr)-qre))
-        #             qnorm = summ[hidx]/npix[hidx]
-        #             break
-        #
-        #     tmpr += 1
-        #     counter += 1
+        radii = np.arange(0.5, a, 0.5)
+        # b = radii*np.sqrt(1-e**2)
+        # ell = ((tmpx-xc)*np.cos(to)+(tmpy-yc)*np.sin(to))**2./a**2 + ((tmpx-xc)*np.sin(to)-(tmpy-yc)*np.cos(to))**2./(a*e)**2.
+        # tmpidx = np.where(ell<1)[0]
+        # maxflux = np.nansum(data[tmpidx])
+
+        phot_table = hstack([ aperture_photometry(img, EllipticalAperture((xc,yc), r, r*e, theta=to), mask=np.isnan(img) ) for r in radii ])
+        apertureFluxes  = [ phot_table['aperture_sum_{}'.format(i+1)].data[0] for i in range(len(radii))]
+        apertureAreas =  [ EllipticalAperture((xc,yc), r, r*e, theta=to).area for r in radii]
+
+        if weighted_map is not None:
+            phot_table = hstack([ aperture_photometry(img/weighted_map, EllipticalAperture((xc,yc), r, r*e, theta=to), mask=np.isnan(img) ) for r in radii ])
+            weightedFluxes  = [ phot_table['aperture_sum_{}'.format(i+1)].data[0] for i in range(len(radii))]
+
+            # maxidx = np.argmax(weightedFluxes[:]) #tmpidx
+            tmpidx = np.argmin(abs(weightedFluxes - weightedFluxes[ np.argmax(weightedFluxes[:]) ]/2.))
+            weighted_qre = radii[tmpidx]
+            weighted_qnorm = apertureFluxes[tmpidx]/apertureAreas[tmpidx]
+
+        radii = np.arange(0.5, a, 0.5)
+        phot_table = hstack([ aperture_photometry(img/weighted_map, EllipticalAnnulus((xc,yc), r, r+1, (r+1)*e, theta=to), mask=np.isnan(img) ) for r in radii ])
+        annulusFluxes = np.array([ phot_table['aperture_sum_{}'.format(i+1)].data[0] for i in range(len(radii))])
+        annulusAreas =  np.array([ EllipticalAnnulus((xc,yc), r, r+1, (r+1)*e, theta=to).area for r in radii])
+
+        # tmpidx = np.where(radii<a*0.5)[0][-1]
+        maxidx = np.argmax(apertureFluxes[:]) #tmpidx
+        hidx = np.argmin(abs(apertureFluxes[:maxidx]-apertureFluxes[maxidx]/2.))
+        qre = radii[hidx]
+        qnorm = apertureFluxes[hidx]/apertureAreas[hidx]
 
         # fig = plt.figure(figsize=(6,4))
         # ax = fig.add_subplot(1,1,1)
         # ax2 = ax.twinx()
         #
-        # ax.scatter(np.arange(1,len(summ)+1), summ)
+        # ax.scatter(radii, apertureFluxes, color='tab:blue')
+        # ax.scatter(radii, weightedFluxes, color='tab:red')
         # # ax.axvline(x=maxidx)
-        # ax.axvline(x=a*0.5, color='grey')
-        # ax.axvline(x=qre, linestyle='--', color='grey')
+        # ax.axvline(x=qre, color='grey')
+        # ax.axvline(x=weighted_qre, linestyle='--', color='grey')
         # # ax.axhline(y=summ[maxidx]/2., linestyle=':', color='grey')
         #
-        # ax2.scatter(np.arange(2,len(summ)+1), increase, color='tab:red')
-        # # ax2.set_ylim([-0.01, 0.51])
-        # ax2.axhline(y=0.025, linestyle=':', color='grey')
+        # # ax2.scatter(radii, annulusFluxes, color='tab:purple')
+        # ax2.scatter(radii, annulusFluxes/annulusAreas, color='tab:purple')
+        # ax2.set_ylim([-max(annulusFluxes/annulusAreas)*0.1, max(annulusFluxes/annulusAreas)*1.1])
         # plt.show()
 
-        return qnorm, qre
+        return weighted_qnorm, weighted_qre#qnorm, qre
 
 
     def _re_cutoff(array, qre):
@@ -783,7 +758,7 @@ def coadd_profile(prop, phot_vars, zphot):
     res = []
     for i, physvar in enumerate(prop[:1]):
         dmask = 10**(physvar[~np.isnan(physvar)].ravel())
-        norm, re = halflightR(dmask, 10**physvar, mass=True)
+        norm, re = halflightR(dmask, 10**physvar, mass=True, weighted_map=weighted_map)
         res.append(re)
 
         dnorm = np.log10(dmask/norm)
@@ -804,7 +779,7 @@ def coadd_profile(prop, phot_vars, zphot):
     for i, photvar in enumerate(phot_vars):
         dmask = photvar[~np.isnan(photvar)].ravel()
 
-        norm, re = halflightR(dmask, photvar)
+        norm, re = halflightR(dmask, photvar, mass=False, weighted_map=weighted_map)
         res.append(re)
 
         dnorm = np.log10(dmask/norm)
