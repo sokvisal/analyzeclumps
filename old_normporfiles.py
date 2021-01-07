@@ -131,6 +131,9 @@ def caddnorm_plot(rgb_img, maps, normmaps, params, titleparams, res, show=False,
     from misc import rainbowb
     from matplotlib import gridspec
     from matplotlib.ticker import MaxNLocator
+
+    plt.rc('font', family='sans-serif')
+
     plt.rcParams.update({'font.size':11,\
                         'xtick.direction':'in', 'ytick.direction':'in', 'xtick.minor.visible':'True',\
                         'axes.linewidth':1.2,\
@@ -484,7 +487,7 @@ def _return_cm(mass):
 
     return yi, xi, yc, xc, theta0, a, b
 
-def coadd_profile(prop, phot_vars, zphot, weighted_map=None):
+def coadd_profile(segmap_params, prop, phot_vars, zphot, weighted_map=None):
     '''
     This function create the co-added normalized profile. First the function finds the COM and distribution
     of mass in the galaxy. This is used to find the half-light/mass radius of the galaxy. The average value
@@ -536,71 +539,15 @@ def coadd_profile(prop, phot_vars, zphot, weighted_map=None):
         rbinsize = 2
         binr = np.arange(0,50+rbinsize,rbinsize)
 
-        # plt.hist(theta, bins = bintheta, density=True)
-        # plt.show()
-        #
-        # plt.hist(r[r.ravel()<percentile], bins = binr, density=True)
-        # plt.axvline(x=np.sqrt((mode(myround(r.ravel(), 2))[0][0]**2)/(1-0.64)))
-        # plt.show()
-
-        # htheta = np.histogram(theta, bins = bintheta, density=True)
-        # hr = np.histogram(r, bins = binr, density=True)
-        #
-        # from scipy import interpolate
-        # from sklearn import mixture
-        # rs = np.arange(rbinsize/2., 50+rbinsize/2., rbinsize)
-        # ts = np.arange(tbinsize/2., 180+tbinsize/2., tbinsize)
-        #
-        # samples = np.dstack((rs,hr[0]))[0]
-        #
-        # def getbimodal(data, xbins, angle=False):
-        #     from scipy import interpolate
-        #     from sklearn import mixture
-        #
-        #     def gauss_function(x, amp, x0, sigma):
-        #         return amp * np.exp(-(x - x0) ** 2. / (2. * sigma ** 2.))
-        #
-        #     gmix = mixture.GaussianMixture(n_components = 2)
-        #     fitted = gmix.fit(data) # data is shaped as (len, 1)
-        #
-        #      # Construct function manually as sum of gaussians
-        #     gmm_sum = np.full_like(xbins, fill_value=0, dtype=np.float32)
-        #     for m, c, w in zip(fitted.means_.ravel(), fitted.covariances_.ravel(), fitted.weights_.ravel()):
-        #         gauss = gauss_function(x=xbins, amp=1, x0=m, sigma=np.sqrt(c))
-        #         gmm_sum += gauss / np.trapz(gauss, xbins) * w
-        #
-        #         mindis = np.min([fitted.means_[0], fitted.means_[1]])
-        #         maxdis = np.max([fitted.means_[0], fitted.means_[1]])
-        #         if angle:
-        #             minidx = np.argmin(fitted.weights_)
-        #             mindis = fitted.means_[minidx][0]
-        #             maxidx = np.argmax(fitted.weights_)
-        #             maxdis = fitted.means_[maxidx][0]
-        #
-        #     return mindis, maxdis, gmm_sum
-        #
-        # b, a, gmm_r_sum = getbimodal(r, rs)
-        # tmin, tmax, gmm_t_sum = getbimodal(theta, ts, angle=True)
-
-
         if diagnostic:
-            plt.subplots(1,2, figsize=(6,3))
-            plt.subplot(1,2,1)
             plt.hist(theta, bins = bintheta, density=True)
-            plt.title('Angle distribution')
-    #         plt.plot(bintheta, g_fit(bintheta))
-            plt.plot(ts, gmm_t_sum, color="crimson", lw=4, label="GMM")
-
-            plt.subplot(1,2,2)
-            plt.hist(r, bins = binr, density=True)
-            plt.plot(rs, gmm_r_sum, color="crimson", lw=4, label="GMM")
-            plt.title('R distribution')
             plt.show()
 
-#         theta = g_fit.mean.value
-        # return np.deg2rad(tmax), a, b
-        # print (mode(myround(theta.ravel()))[0][0],  max(myround(r.ravel(), 2)), mode(myround(r.ravel(), 2))[0][0] )
-        # return np.deg2rad(mode(myround(theta.ravel()))[0][0]), max(myround(r.ravel(), 2)), mode(myround(r.ravel(), 2))[0][0]
+            plt.hist(r[r.ravel()<percentile], bins = binr, density=True)
+            plt.axvline(x= mode(myround(r.ravel(), 2))[0][0], color='tab:green')
+            # plt.axvline(x=np.sqrt((mode(myround(r.ravel(), 2))[0][0]**2)/(1-0.64)))
+            plt.axvline(x=np.sqrt((mode(myround(r.ravel(), 2))[0][0]**2)/(1-0.64)))
+            plt.show()
 
         return np.deg2rad(mode(myround(theta.ravel()))[0][0]), max(r.ravel()[r.ravel()<percentile]), mode(myround(r.ravel(), 2))[0][0]
 
@@ -629,9 +576,13 @@ def coadd_profile(prop, phot_vars, zphot, weighted_map=None):
     #h = stellar_mass.shape[0]
     #w = stellar_mass.shape[0]
 
-    to, a, b = galparams(stellar_mass)
-    e = b/a # axial ratio as defined by Wuyts12
-    # e = np.sqrt(1-b**2/a**2)
+    # to, a, b = galparams(stellar_mass)
+    # e = b/a # axial ratio as defined by Wuyts12
+    a, b, phi = segmap_params
+    print (a,b)
+    e = np.sqrt(1-b**2/a**2)
+    to = phi
+
     # print ('eccentricity', e, b/a)
     # e = mwb/mwa
 #     print 'gal params: ', to, mwb, mwa
@@ -654,12 +605,12 @@ def coadd_profile(prop, phot_vars, zphot, weighted_map=None):
         # tmpidx = np.where(ell<1)[0]
         # maxflux = np.nansum(data[tmpidx])
 
-        phot_table = hstack([ aperture_photometry(img, EllipticalAperture((xc,yc), r, r*e, theta=to), mask=np.isnan(img) ) for r in radii ])
+        phot_table = hstack([ aperture_photometry(img, EllipticalAperture((xc,yc), r, r*np.sqrt(1-e**2), theta=to), mask=np.isnan(img) ) for r in radii ])
         apertureFluxes  = [ phot_table['aperture_sum_{}'.format(i+1)].data[0] for i in range(len(radii))]
         apertureAreas =  [ EllipticalAperture((xc,yc), r, r*e, theta=to).area for r in radii]
 
         if weighted_map is not None:
-            phot_table = hstack([ aperture_photometry(img/weighted_map, EllipticalAperture((xc,yc), r, r*e, theta=to), mask=np.isnan(img) ) for r in radii ])
+            phot_table = hstack([ aperture_photometry(img/weighted_map, EllipticalAperture((xc,yc), r, r*np.sqrt(1-e**2), theta=to), mask=np.isnan(img) ) for r in radii ])
             weightedFluxes  = [ phot_table['aperture_sum_{}'.format(i+1)].data[0] for i in range(len(radii))]
 
             # maxidx = np.argmax(weightedFluxes[:]) #tmpidx
@@ -667,10 +618,10 @@ def coadd_profile(prop, phot_vars, zphot, weighted_map=None):
             weighted_qre = radii[tmpidx]
             weighted_qnorm = apertureFluxes[tmpidx]/apertureAreas[tmpidx]
 
-        radii = np.arange(0.5, a, 0.5)
-        phot_table = hstack([ aperture_photometry(img/weighted_map, EllipticalAnnulus((xc,yc), r, r+1, (r+1)*e, theta=to), mask=np.isnan(img) ) for r in radii ])
-        annulusFluxes = np.array([ phot_table['aperture_sum_{}'.format(i+1)].data[0] for i in range(len(radii))])
-        annulusAreas =  np.array([ EllipticalAnnulus((xc,yc), r, r+1, (r+1)*e, theta=to).area for r in radii])
+        # radii = np.arange(0.5, a, 0.5)
+        # phot_table = hstack([ aperture_photometry(img/weighted_map, EllipticalAnnulus((xc,yc), r, r+1, (r+1)*np.sqrt(1-e**2), theta=to), mask=np.isnan(img) ) for r in radii ])
+        # annulusFluxes = np.array([ phot_table['aperture_sum_{}'.format(i+1)].data[0] for i in range(len(radii))])
+        # annulusAreas =  np.array([ EllipticalAnnulus((xc,yc), r, r+1, (r+1)*e, theta=to).area for r in radii])
 
         # tmpidx = np.where(radii<a*0.5)[0][-1]
         maxidx = np.argmax(apertureFluxes[:]) #tmpidx
@@ -699,7 +650,7 @@ def coadd_profile(prop, phot_vars, zphot, weighted_map=None):
 
     def _re_cutoff(array, qre):
         ell = ((xi-xc)*np.cos(to)+(yi-yc)*np.sin(to))**2./(qre)**2 \
-                + ((xi-xc)*np.sin(to)-(yi-yc)*np.cos(to))**2./(qre*e)**2.
+                + ((xi-xc)*np.sin(to)-(yi-yc)*np.cos(to))**2./(qre*np.sqrt(1-e**2))**2.
         tmpidx = np.where(ell<1)[0]
         return tmpidx
 
@@ -767,7 +718,7 @@ def coadd_profile(prop, phot_vars, zphot, weighted_map=None):
 
         sfrnorm = norm_sfrd(lsfr, re)
         ssfr = 10**(lsfr[~np.isnan(lsfr)].ravel()-m[~np.isnan(m)].ravel())
-        ell_h, ell_f  = ellipses(re, e*re, to)
+        ell_h, ell_f  = ellipses(re, np.sqrt(1-e**2)*re, to)
         tmp = mapNorm([yi, xi, rnorm, dnorm, uvrest[~np.isnan(m)].ravel(), physvar[~np.isnan(physvar)].ravel(), sfrnorm, agew[~np.isnan(agew)].ravel()], re2idx)
 
         gal_par.insert(len(gal_par), ell_h)
@@ -794,7 +745,7 @@ def coadd_profile(prop, phot_vars, zphot, weighted_map=None):
 
         sfrnorm = norm_sfrd(lsfr, re)
         ssfr = 10**(lsfr[~np.isnan(lsfr)].ravel()-m[~np.isnan(m)].ravel())
-        ell_h, ell_f  = ellipses(re, e*re, to)
+        ell_h, ell_f  = ellipses(re, np.sqrt(1-e**2)*re, to)
         tmp = mapNorm([yi, xi, rnorm, dnorm, uvrest[~np.isnan(m)].ravel(), photvar[~np.isnan(photvar)].ravel(), sfrnorm, agew[~np.isnan(agew)].ravel()], re2idx)
 
         gal_par.insert(len(gal_par), ell_h)
