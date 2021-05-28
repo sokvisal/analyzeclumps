@@ -573,7 +573,7 @@ def coadd_profile(prop, phot_vars, zphot, weighted_map=None):
     e = b/a # axial ratio as defined by Wuyts12
     # a, b, phi = segmap_params
     # print (a,b)
-    e = np.sqrt(1-b**2/a**2)
+    # e = np.sqrt(1-b**2/a**2)
     # to = phi
 
     # print ('eccentricity', e, b/a)
