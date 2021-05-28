@@ -124,7 +124,7 @@ def caddnorm_plot(rgb_img, maps, normmaps, params, titleparams, res, show=False,
 
     nrow = 4
     ncol = 4
-    plt.rcParams.update({'font.size':6})
+
     fig = plt.figure(figsize=((ncol+1)*2.*3.4/4., (nrow+1)*2.))
     # plt.show()
 
@@ -134,7 +134,7 @@ def caddnorm_plot(rgb_img, maps, normmaps, params, titleparams, res, show=False,
 
     plt.rc('font', family='sans-serif')
 
-    plt.rcParams.update({'font.size':11,\
+    plt.rcParams.update({'font.size':15,\
                         'xtick.direction':'in', 'ytick.direction':'in', 'xtick.minor.visible':'True',\
                         'axes.linewidth':1.2,\
                         'xtick.major.width':1.2, 'xtick.minor.width':1.0, 'xtick.major.size':5., 'xtick.minor.size':3.0,\
@@ -155,8 +155,8 @@ def caddnorm_plot(rgb_img, maps, normmaps, params, titleparams, res, show=False,
     ################### RGB MAP ########################
     ax = plt.subplot(gs[0,0], aspect='auto')
     ax.imshow(segrgb, origin='lower')
-    ax.text(5,108,'(a)'.format(titleparams[0]), color='w', weight='bold')
-    ax.text(5,15,'z = {}'.format(titleparams[0]), color='w', weight='bold')
+    ax.text(5,108,'(i)'.format(titleparams[0]), color='w', weight='bold')
+    # ax.text(5,15,'z = {}'.format(titleparams[0]), color='w', weight='bold')
     ax.text(5,5,'ID{}'.format(titleparams[1]), color='w', weight='bold')
     ax.set_xticks([])
     ax.set_yticks([])
@@ -171,53 +171,40 @@ def caddnorm_plot(rgb_img, maps, normmaps, params, titleparams, res, show=False,
     ################### (U-V)rest ########################
     ax = plt.subplot(gs[0,1], aspect='auto')
     ax.imshow(uvrest[c-citv:c+citv,c-citv:c+citv], origin='lower', cmap='Spectral_r', vmin=vmin, vmax=vmax)
-    ax.text(5,108,'(e)', weight='bold')
-    ax.text(5,5,'Rest-frame (U-V) Color')
+    ax.text(5,108,'(v)', weight='bold')
+    ax.text(5,5,'Rest-frame (U-V)')
     ax.set_xticks([])
     ax.set_yticks([])
     # ax.axis('off')
 
-    ################### Stellar Mass ########################
+    ################## Stellar Mass ########################
     ax = plt.subplot(gs[1,0], aspect='auto')
     ax.imshow(sm[c-citv:c+citv,c-citv:c+citv], origin='lower', cmap='viridis')#, vmin=5.5)
     ax.plot([xc-dc], [yc-dc], marker='x', markersize=6, color="r")
-    ax.text(5,108,'(b)', weight='bold')
-    ax.text(5,5,'Stellar Mass')
+    ax.text(5,108,'(ii)', weight='bold')
+    ax.text(5,5,'Mass')
     ax.set_xticks([])
     ax.set_yticks([])
     ax.plot(xc-dc+ell_mh[0,:], yc-dc+ell_mh[1,:], linestyle='--',  color="r", linewidth=2, label='R$_\mathrm{e}$')
     ax.plot(xc-dc+ell_mf[0,:], yc-dc+ell_mf[1,:], color="r", linewidth=2, label='2R$_\mathrm{e}$')
     ax.legend(frameon=False, loc=1)
 
-    ################### Mass Clump map ########################
-    ax = plt.subplot(gs[1,3], aspect='auto')
-    ax.imshow(clumpmap_m[c-citv:c+citv,c-citv:c+citv], origin='lower', cmap=cmap, vmax=4)
-    # ax.text(5,5,'Mass Clump Map (%i)' %(int(extend_clumpyid[0])))
-    ax.text(5,108,'(i)', weight='bold')
-    ax.text(5,5,'Mass Clump Map')
-    if mclump>0.08: ax.text(5,15,'Mass Clumpy')
-    ax.set_xticks([])
-    ax.set_yticks([])
-    ax.plot(xc-dc+ell_mh[0,:], yc-dc+ell_mh[1,:], linestyle='--',  color="k", linewidth=1, label='R$_\mathrm{e}$')
-    ax.plot(xc-dc+ell_mf[0,:], yc-dc+ell_mf[1,:], color="k", linewidth=1, label='2R$_\mathrm{e}$')
-
-    # ax.axis('off')
-
-    ################### Stellar Mass Clumps ########################
+    ################## Stellar Mass Clumps ########################
     ax = plt.subplot(gs[1,1], aspect='auto')
-    ax.scatter(massNorm[2], massNorm[3], c=massNorm[4], s=10, cmap='Spectral_r', vmin=vmin, vmax=vmax)
+    order = np.argsort(massNorm[4])[::-1]
+    ax.scatter(np.array(massNorm[2])[order], np.array(massNorm[3])[order], c=np.array(massNorm[4])[order], s=10, cmap='Spectral_r', vmin=vmin, vmax=vmax)
     # ax.scatter(massNorm[2], massNorm[3], c=clumpmap_m_r, s=10, cmap=cmap, vmax=4)
     ax.text(-1.5,-0.6,'Inner')
-    ax.text(-0.3,-1.6, 'Outer')
-    ax.text(-0.2,0.7, 'Clump')
+    ax.text(-0.4,-1.8, 'Outer')
+    ax.text(-0.4,0.7, 'Clump')
     ax.axvline(x=-0.5, color='k', linestyle='--', linewidth=2)
     # ax.axvline(x=0, color='k', linestyle='-.', linewidth=1)
     # ax.axvline(x=np.log10(2), color='k', linestyle='-.', linewidth=1)
     ax.plot(tmpx, tmpy, color='k', linestyle='--', linewidth=2)
     # ax.plot(tmpx, tmpy2, color='r', linestyle='-.', linewidth=1)
 
-    ax.text(-2.3,0.875,'(f)', weight='bold')
-    ax.text(-2.3,-2., 'Stellar Mass')
+    ax.text(-2.3,0.875,'(vi)', weight='bold')
+    ax.text(-2.3,-2., 'Mass')
     ax.set_ylim([-2.2,1.2])
     ax.set_xlim([-2.5,1.])
     ax.set_aspect(3.5/3.4)
@@ -226,49 +213,40 @@ def caddnorm_plot(rgb_img, maps, normmaps, params, titleparams, res, show=False,
     ax.set_ylabel(r'log($\Sigma/\Sigma_{e}$)')
     ax.set_xlabel('log(R/R$_e$)')
 
-    # labels = ax.get_yticklabels()
-    # # remove the first and the last labels
-    # labels[0] = labels[-1] = ""
-    # ax.set_yticklabels(labels)
+    ################### Mass Clump map ########################
+    ax = plt.subplot(gs[1,3], aspect='auto')
+    ax.imshow(clumpmap_m[c-citv:c+citv,c-citv:c+citv], origin='lower', cmap=cmap, vmax=4)
+    # ax.text(5,5,'Mass Clump Map (%i)' %(int(extend_clumpyid[0])))
+    ax.text(5,108,'(ix)', weight='bold')
+    ax.text(5,5,'Mass Clump Map')
+    if mclump>0.08: ax.text(5,15,'Mass Clumpy')
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.plot(xc-dc+ell_mh[0,:], yc-dc+ell_mh[1,:], linestyle='--',  color="k", linewidth=1, label='R$_\mathrm{e}$')
+    ax.plot(xc-dc+ell_mf[0,:], yc-dc+ell_mf[1,:], color="k", linewidth=1, label='2R$_\mathrm{e}$')
 
-    # ax.set_yticks([])
-    # ax.yaxis.set_major_locator(plt.NullLocator())
-    # ax.yaxis.set_major_locator(MaxNLocator(3))
-    # ax.xaxis.set_major_locator(MaxNLocator(5))
 
     ################### Urest Luminosity ########################
     ax = plt.subplot(gs[2,0], aspect='auto')
     ax.imshow(lu[c-citv:c+citv,c-citv:c+citv], origin='lower', cmap='inferno')
     ax.plot([xc-dc], [yc-dc], marker='x', markersize=6, color="tab:green")
-    ax.text(5,108,'(c)', weight='bold')
-    ax.text(5,5,'U$_\mathrm{rest}$')
+    ax.text(5,108,'(iii)', weight='bold')
+    ax.text(5,5,'$U_\mathrm{rest}$')
     ax.set_xticks([])
     ax.set_yticks([])
-    ax.plot(xc-dc+ell_uh[0,:], yc-dc+ell_uh[1,:], linestyle='--',  color="tab:green", linewidth=2, label='R$_\mathrm{e}$')
-    ax.plot(xc-dc+ell_uf[0,:], yc-dc+ell_uf[1,:], color="tab:green", linewidth=2, label='2R$_\mathrm{e}$')
-    ax.legend(frameon=False, loc=1)
+    ax.plot(xc-dc+ell_uh[0,:], yc-dc+ell_uh[1,:], linestyle='--',  color="tab:green", linewidth=1, label='R$_\mathrm{e}$')
+    ax.plot(xc-dc+ell_uf[0,:], yc-dc+ell_uf[1,:], color="tab:green", linewidth=1, label='2R$_\mathrm{e}$')
+    ax.legend(frameon=False, loc=4)
     # ax.axis('off')
-
-    ################### Clump map ########################
-    ax = plt.subplot(gs[2,3], aspect='auto')
-    ax.imshow(clumpmap_u[c-citv:c+citv,c-citv:c+citv], origin='lower', cmap=cmap, vmax=4)
-    # ax.text(5,5,'U$_\mathrm{rest}$ Clump Map (%i)' %(int(extend_clumpyid[2])))
-    ax.text(5,108,'(j)', weight='bold')
-    ax.text(5,5,'U$_\mathrm{rest}$ Clump Map')
-    if uclump>0.08: ax.text(5,15,'U$_\mathrm{rest}$ Clumpy')
-    ax.set_xticks([])
-    ax.set_yticks([])
-    ax.plot(xc-dc+ell_uh[0,:], yc-dc+ell_uh[1,:], linestyle='--',  color="k", linewidth=1, label='R$_\mathrm{e}$')
-    ax.plot(xc-dc+ell_uf[0,:], yc-dc+ell_uf[1,:], color="k", linewidth=1, label='2R$_\mathrm{e}$')
-
 
     ################### Urest Clump ########################
     ax = plt.subplot(gs[2,1], aspect='auto') # aspect='equal'
-    ax.scatter(uNorm[2], uNorm[3], c=uNorm[4], s=10, cmap='Spectral_r', vmin=vmin, vmax=vmax)
+    order = np.argsort(uNorm[4])#[::-1]
+    ax.scatter(np.array(uNorm[2])[order], np.array(uNorm[3])[order], c=np.array(uNorm[4])[order], s=10, cmap='Spectral_r', vmin=vmin, vmax=vmax)
     # ax.scatter(uNorm[2], uNorm[3], c=clumpmap_u_r, s=10, cmap=cmap, vmax=4)
     ax.text(-1.5,-0.6,'Inner')
-    ax.text(-0.3,-1.6, 'Outer')
-    ax.text(-0.2,0.7, 'Clump')
+    ax.text(-0.4,-1.8, 'Outer')
+    ax.text(-0.4,0.7, 'Clump')
     ax.axvline(x=-0.5, color='k', linestyle='--', linewidth=2)
     # ax.axvline(x=0, color='k', linestyle='-.', linewidth=1)
     # ax.axvline(x=np.log10(2), color='k', linestyle='-.', linewidth=1)
@@ -277,8 +255,8 @@ def caddnorm_plot(rgb_img, maps, normmaps, params, titleparams, res, show=False,
     ax.plot(tmpx, tmpy, color='k', linestyle='--', linewidth=2)
     # ax.plot(xcoord, ycoord, color='k', linestyle='--', linewidth=1)
 
-    ax.text(-2.3,0.875,'(g)', weight='bold')
-    ax.text(-2.3,-2., 'U$_\mathrm{rest}$')
+    ax.text(-2.3,0.875,'(vii)', weight='bold')
+    ax.text(-2.3,-2., '$U_\mathrm{rest}$')
     ax.set_ylim([-2.2,1.2])
     ax.set_xlim([-2.5,1.])
     ax.set_aspect(3.5/3.4)
@@ -293,12 +271,26 @@ def caddnorm_plot(rgb_img, maps, normmaps, params, titleparams, res, show=False,
     # ax.yaxis.set_major_locator(MaxNLocator(5))
     # ax.xaxis.set_major_locator(MaxNLocator(5))
 
+    ################### Clump map ########################
+    ax = plt.subplot(gs[2,3], aspect='auto')
+    ax.imshow(clumpmap_u[c-citv:c+citv,c-citv:c+citv], origin='lower', cmap=cmap, vmax=4)
+    # ax.text(5,5,'U$_\mathrm{rest}$ Clump Map (%i)' %(int(extend_clumpyid[2])))
+    ax.text(5,108,'(x)', weight='bold')
+    ax.text(5,5,'$U_\mathrm{rest}$ Clump Map')
+    if uclump>0.08: ax.text(5,20,'Clumpy in $U_\mathrm{rest}$')
+    # if uclump>0.08: ax.text(5,15,'U$_\mathrm{rest}$ Clumpy')
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.plot(xc-dc+ell_uh[0,:], yc-dc+ell_uh[1,:], linestyle='--',  color="k", linewidth=1, label='R$_\mathrm{e}$')
+    ax.plot(xc-dc+ell_uf[0,:], yc-dc+ell_uf[1,:], color="k", linewidth=1, label='2R$_\mathrm{e}$')
+
+
     ################### Vrest Luminosity ########################
     ax = plt.subplot(gs[3,0], aspect='auto')
     ax.imshow(lv[c-citv:c+citv,c-citv:c+citv], origin='lower', cmap='inferno')
     ax.plot([xc-dc], [yc-dc], marker='x', markersize=6, color="tab:green")
-    ax.text(5,108,'(d)', weight='bold')
-    ax.text(5,5,'V$_\mathrm{rest}$')
+    ax.text(5,108,'(iv)', weight='bold')
+    ax.text(5,5,'$V_\mathrm{rest}$')
     ax.set_xticks([])
     ax.set_yticks([])
     ax.plot(xc-dc+ell_vh[0,:], yc-dc+ell_vh[1,:], linestyle='--',  color="tab:green", linewidth=2, label='R$_\mathrm{e}$')
@@ -306,32 +298,18 @@ def caddnorm_plot(rgb_img, maps, normmaps, params, titleparams, res, show=False,
     ax.legend(frameon=False, loc=1)
     # ax.axis('off')
 
-    ################### Clump map ########################
-    ax = plt.subplot(gs[3,3], aspect='auto')
-    ax.imshow(clumpmap_v[c-citv:c+citv,c-citv:c+citv], origin='lower', cmap=cmap, vmax=4)
-    # ax.text(5,5,'V$_\mathrm{rest}$ Clump Map (%i)' %(int(extend_clumpyid[3])))
-    ax.text(5,108,'(k)', weight='bold')
-    ax.text(5,5,'V$_\mathrm{rest}$ Clump Map')
-    if vclump>0.08: ax.text(5,15,'V$_\mathrm{rest}$ Clumpy')
-    ax.set_xticks([])
-    ax.set_yticks([])
-    ax.plot(xc-dc+ell_vh[0,:], yc-dc+ell_vh[1,:], linestyle='--',  color="k", linewidth=1, label='R$_\mathrm{e}$')
-    ax.plot(xc-dc+ell_vf[0,:], yc-dc+ell_vf[1,:], color="k", linewidth=1, label='2R$_\mathrm{e}$')
-
-    # ax.axis('off')
-
     ################### Urest Clump ########################
     ax = plt.subplot(gs[3,1], aspect='auto') # aspect='equal'
     # ax.scatter(vNorm[2], vNorm[3], c=vNorm[4], s=10, cmap='Spectral_r', vmin=vmin, vmax=vmax)
     ax.scatter(vNorm[2], vNorm[3], c=clumpmap_v_r, s=10, cmap=cmap, vmax=4)
     ax.text(-1.5,-0.6,'Inner')
-    ax.text(-0.3,-1.6, 'Outer')
-    ax.text(-0.2,0.7, 'Clump')
+    ax.text(-0.4,-1.8, 'Outer')
+    ax.text(-0.4,0.7, 'Clump')
 
     ax.axvline(x=-0.5, color='k', linestyle='--', linewidth=2)
     ax.plot(tmpx, tmpy, color='k', linestyle='--', linewidth=2)
-    ax.text(-2.3,0.875,'(h)', weight='bold')
-    ax.text(-2.3,-2., 'V$_\mathrm{rest}$')
+    ax.text(-2.3,0.875,'(viii)', weight='bold')
+    ax.text(-2.3,-2., '$V_\mathrm{rest}$')
     ax.set_ylim([-2.2,1.2])
     ax.set_xlim([-2.5,1.])
     ax.set_aspect(3.5/3.4)
@@ -339,6 +317,21 @@ def caddnorm_plot(rgb_img, maps, normmaps, params, titleparams, res, show=False,
     ax.yaxis.set_label_position("right")
     ax.set_ylabel(r'log($\Sigma/\Sigma_{e}$)')
     ax.set_xlabel('log(R/R$_e$)')
+
+    ################### Clump map ########################
+    ax = plt.subplot(gs[3,3], aspect='auto')
+    ax.imshow(clumpmap_v[c-citv:c+citv,c-citv:c+citv], origin='lower', cmap=cmap, vmax=4)
+    # ax.text(5,5,'V$_\mathrm{rest}$ Clump Map (%i)' %(int(extend_clumpyid[3])))
+    ax.text(5,108,'(xi)', weight='bold')
+    ax.text(5,5,'$V_\mathrm{rest}$ Clump Map')
+    if vclump>0.08: ax.text(5,20,'Clumpy in $V_\mathrm{rest}$')
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.plot(xc-dc+ell_vh[0,:], yc-dc+ell_vh[1,:], linestyle='--',  color="k", linewidth=1, label='R$_\mathrm{e}$')
+    ax.plot(xc-dc+ell_vf[0,:], yc-dc+ell_vf[1,:], color="k", linewidth=1, label='2R$_\mathrm{e}$')
+
+    # ax.axis('off')
+
     if show and type(savedir) != type(True):
         plt.savefig(savedir+'/_id-{}.png'.format(titleparams[1]), dpi=300, bbox_inches = 'tight')
         plt.close()
@@ -487,7 +480,7 @@ def _return_cm(mass):
 
     return yi, xi, yc, xc, theta0, a, b
 
-def coadd_profile(segmap_params, prop, phot_vars, zphot, weighted_map=None):
+def coadd_profile(prop, phot_vars, zphot, weighted_map=None):
     '''
     This function create the co-added normalized profile. First the function finds the COM and distribution
     of mass in the galaxy. This is used to find the half-light/mass radius of the galaxy. The average value
@@ -576,12 +569,12 @@ def coadd_profile(segmap_params, prop, phot_vars, zphot, weighted_map=None):
     #h = stellar_mass.shape[0]
     #w = stellar_mass.shape[0]
 
-    # to, a, b = galparams(stellar_mass)
-    # e = b/a # axial ratio as defined by Wuyts12
-    a, b, phi = segmap_params
-    print (a,b)
+    to, a, b = galparams(stellar_mass)
+    e = b/a # axial ratio as defined by Wuyts12
+    # a, b, phi = segmap_params
+    # print (a,b)
     e = np.sqrt(1-b**2/a**2)
-    to = phi
+    # to = phi
 
     # print ('eccentricity', e, b/a)
     # e = mwb/mwa
