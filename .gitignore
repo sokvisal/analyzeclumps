@@ -1,5 +1,4 @@
 
-**/sedfiles/*.param
 
 **/__pycache__
 *.pyc
