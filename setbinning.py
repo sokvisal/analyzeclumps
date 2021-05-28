@@ -212,11 +212,7 @@ def getnoisedis(directories, path, catpath, deconvOffset=False, offset=False):
             apermask = misc.createCircularMask(156, 156, center=[156/2, 156/2], radius=21.)
             masked_img = data.copy()
             masked_img[~apermask] = 0
-<<<<<<< HEAD
             print (diagnostics.search_cfg(fdir+'/config.py'.format(tile[1:]), 'IMG_FACT')[1:-1])
-=======
-            # print (diagnostics.search_cfg(fdir+'/config.py'.format(tile[1:]), 'IMG_FACT')[1:-1])
->>>>>>> 22f63fcf2c798ae6289df7a2b7cedeb3e8c41268
             fact = float(diagnostics.search_cfg(fdir+'/config.py'.format(tile[1:]), 'IMG_FACT')[1:-1])
             # print (snr/masked_img.sum()*masked_img.sum(), snr )
 
