@@ -13,10 +13,10 @@ def fit(path, tile):
     for i in tqdm(directories[:]):
 
         if os.path.isdir(i+'/test_phot'):
-            # for dir in glob.glob('../analyzeclumps/sedfiles/*.param'):
-            #     shutil.copyfile(dir, i+'/test_phot/{}'.format(os.path.basename(dir)))
+            for dir in glob.glob('../analyzeclumps/sedfiles/*.param'):
+                shutil.copyfile(dir, i+'/test_phot/{}'.format(os.path.basename(dir)))
             # if os.path.islink(i+'/test_phot/templates'): os.unlink(i+'/test_phot/templates')
-            # os.system('ln -s {}/sedfiles/templates {}/test_phot/templates'.format(script_dir, i))
+            os.system('ln -s {}/sedfiles/templates {}/test_phot/templates'.format(script_dir, i))
             if os.path.isdir(i+'/test_phot/OUTPUT'):  shutil.rmtree(i+'/test_phot/OUTPUT')
             os.makedirs(i+'/test_phot/OUTPUT')
 
