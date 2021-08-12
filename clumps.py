@@ -14,7 +14,7 @@ cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
 
 from operator import itemgetter
 from astropy.io import fits
-
+import pandas as pd
 
 import structparams
 import normprofiles
@@ -90,8 +90,14 @@ def _return_photometry(directory, z):
     elif 1.6<z<=2.1:
         vrest = filtsets[4]
 
-    y, x, surest, noise = np.loadtxt(directory+'/{}/vorbin_input.txt'.format(urest)).T
-    y, x, svrest, noise = np.loadtxt(directory+'/{}/vorbin_input.txt'.format(vrest)).T
+    df = pd.read_csv(directory+'/{}/vorbin_input.txt'.format(urest), header=None, delimiter=' ', usecols=[2] ) #header=None
+    surest = df.values.ravel()
+    del df
+
+    df = pd.read_csv(directory+'/{}/vorbin_input.txt'.format(vrest), header=None, delimiter=' ', usecols=[2] ) #header=None
+    svrest = df.values.ravel()
+    del df
+
 #     surest = surest.clip(0.01)
 #     svrest = svrest.clip(0.01)
     return surest, svrest
@@ -102,14 +108,19 @@ def stellarPopMaps(directory, path):
     idnum = int(os.path.basename(directory).split('_')[1].split('-')[1])
     zp = float(os.path.basename(directory).split('_')[2].split('-')[1])
 
-    surest, svrest = _return_photometry(directory, zp)
-    y, x, sNIR, noise = np.loadtxt(directory+'/ultravista-H/vorbin_input.txt').T
+    df = pd.read_csv(directory+'/vorbin_output.txt', header=None, usecols=[0])
+    binNum = df[0].values
+    del df
 
-    binNum = np.loadtxt(directory+'/vorbin_output.txt')
+    df = pd.read_csv(directory+'/ultravista-H/vorbin_input.txt', header=None, delimiter=' ' ) #header=None
+    y, x, sNIR, noise = df.values.T
+    del df
+
     size = 156
 
     binids, la, lm, lsfr, umag, vmag, l2800, chi2 = np.loadtxt(directory+'/test_phot/cosmos.fout', usecols=(0,4,6,7,10,11,12,13), unpack=True)
     hflux = np.loadtxt(directory+'/test_phot/cosmos.cat', usecols=(23), unpack=True)
+
     normlm = (lm-min(lm))/(max(lm)-min(lm))
     normH = (hflux-min(hflux))/(max(hflux)-min(hflux))
     normH = normH.clip(0.05)
@@ -160,9 +171,9 @@ def stellarPopMaps(directory, path):
 
             binmaps[0, ny, nx] = binid
             binmaps[1, ny, nx] = np.sqrt(npix)
-            normu = 1+(surest-np.mean(surest))/(np.max(surest)-np.min(surest))
-            normv = 1+(svrest-np.mean(svrest))/(np.max(svrest)-np.min(svrest))
-            normNIR = 1+(sNIR-np.mean(sNIR))/(np.max(sNIR)-np.min(sNIR))
+            # normu = 1+(surest-np.mean(surest))/(np.max(surest)-np.min(surest))
+            # normv = 1+(svrest-np.mean(svrest))/(np.max(svrest)-np.min(svrest))
+            # normNIR = 1+(sNIR-np.mean(sNIR))/(np.max(sNIR)-np.min(sNIR))
 
             if not np.any(np.isnan([lm[i], l2800[i], umag[i], vmag[i]])):
                 ubinscale = 1+(np.mean(surest[idx])-np.mean(surest))/(np.max(surest)-np.min(surest))#surest[idx]/np.sum(surest[idx])#1+(surest[idx]-np.mean(surest[idx]))/(np.max(surest)-np.min(surest))
@@ -248,7 +259,7 @@ def retrieved_maps(directories, path):
                 # fig, clumpids, ccs, agew_rnorm = normprofiles.make_profile(rgbimg, maps, normmaps,\
                 #                 params, [zp, idnum], tile, outerflux, res=[None, None, None, None],\
                 #                                                            savedir=False, showplot=False) #'{}/plots/{}'.format(path, tile)
-                fig, clumpids, clumpiness, ccs = old_normporfiles.caddnorm_plot(rgbimg, maps, normmaps, params, [zp, idnum], res, show=False, savedir=False) #'{}/plots/{}'.format(path, tile)
+                fig, clumpids, clumpiness, ccs = old_normporfiles.caddnorm_plot(rgbimg, maps, normmaps, params, [zp, idnum], res, plot=False, show=False, save=None) #'{}/plots/{}'.format(path, tile)
 
 
                 newcat_clumps.append([idnum, zp,  galmass_idl, mass, galsfr] + clumpids + ccs + clumpiness + diagnostics)
@@ -276,6 +287,7 @@ def createCat(decpath, tile):
     #                               'mfrac', 'fufrac', 'ufrac', 'vfrac', 'cc_sm', 'cc_sfr', 'cm_density', 'issfr', 'ossfr'),\
     #                                meta={'name': 'cosmos clump id'})
     ids_clumps_cat = Table([ids_clumps[:,i] for i in range(15)],\
-                           names=('id', 'z', 'lm', 'lm_res', 'lsfr', 'mclump', 'fuclump', 'uclump', 'vclump', 'cc_sm', 'cc_sfr', 'cc_uv', 'cm_density', 'issfr', 'ossfr'),\
+                           names=('id', 'z', 'lm', 'lm_res', 'lsfr', 'mclump', 'fuclump', 'uclump', 'vclump',\
+                                    'cc_sm', 'cc_sfr', 'cc_uv', 'cm_density', 'issfr', 'ossfr'),\
                                    meta={'name': 'cosmos clump id'})
     ascii.write(ids_clumps_cat, '{}/clumps-catalog-hubble.dat'.format(dirname[:-5]), overwrite=True, format='commented_header')
