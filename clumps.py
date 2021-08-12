@@ -108,6 +108,8 @@ def stellarPopMaps(directory, path):
     idnum = int(os.path.basename(directory).split('_')[1].split('-')[1])
     zp = float(os.path.basename(directory).split('_')[2].split('-')[1])
 
+    surest, svrest = _return_photometry(directory, zp)
+
     df = pd.read_csv(directory+'/vorbin_output.txt', header=None, usecols=[0])
     binNum = df[0].values
     del df
