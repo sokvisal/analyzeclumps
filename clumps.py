@@ -7,7 +7,7 @@ import glob
 import os
 
 import sys
-sys.path.insert(0, '/hpcstorage/sok/run/cosmos/analyzeclumps')
+sys.path.insert(0, '/scratch/sok/run/cosmos/analyzeclumps')
 
 from astropy.cosmology import FlatLambdaCDM
 cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
@@ -22,8 +22,8 @@ import old_normporfiles
 import misc
 
 
-sfgs_cat = ascii.read('/hpcstorage/sok/run/cosmos_sfgs.dat') #cosmos_final_sfgcat
-fout = ascii.read('/hpcstorage/sok/run/UVISTA_final_v4.1_selected.fout')
+sfgs_cat = ascii.read('/scratch/sok/run/cosmos_sfgs.dat') #cosmos_final_sfgcat
+fout = ascii.read('/scratch/sok/run/UVISTA_final_v4.1_selected.fout')
 _ids = sfgs_cat['id'].data
 
 def getMSFR(idnum):
