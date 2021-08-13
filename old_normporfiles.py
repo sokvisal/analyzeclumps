@@ -606,7 +606,7 @@ def coadd_profile(prop, phot_vars, zphot, weighted_map=None):
         # maxflux = np.nansum(data[tmpidx])
 
         apertures = [ EllipticalAperture((xc,yc), r, r*np.sqrt(1-e**2), theta=to) for r in radii ]
-        phot_table = aperture_photometry(img, apertures)
+        phot_table = aperture_photometry(img, apertures, mask=np.isnan(img) )
         apertureNames = phot_table.colnames[3:]
         apertureFluxes  = [ phot_table[apertureName].data[0] for apertureName in apertureNames ]
         # print ( np.asarray( np.array( phot_table[apertureNames][0] ).item() ) )
