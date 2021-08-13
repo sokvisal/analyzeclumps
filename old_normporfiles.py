@@ -606,18 +606,14 @@ def coadd_profile(prop, phot_vars, zphot, weighted_map=None):
         # tmpidx = np.where(ell<1)[0]
         # maxflux = np.nansum(data[tmpidx])
 
-        apertures = [ EllipticalAperture((xc,yc), r, r*np.sqrt(1-e**2), theta=to) for r in radii ]
+        apertures = [ EllipticalAperture((xc,yc), r, r*e, theta=to) for r in radii ]
         phot_table = aperture_photometry(img, apertures, mask=np.isnan(img) )
         apertureNames = phot_table.colnames[3:]
         apertureFluxes  = [ phot_table[apertureName].data[0] for apertureName in apertureNames ]
-        # print ( np.asarray( np.array( phot_table[apertureNames][0] ).item() ) )
         apertureAreas =  [ aperture.area for aperture in apertures ]
-        # phot_table = hstack([ aperture_photometry(img, EllipticalAperture((xc,yc), r, r*np.sqrt(1-e**2), theta=to), mask=np.isnan(img) ) for r in radii ])
-        # apertureFluxes  = [ phot_table['aperture_sum_{}'.format(i+1)].data[0] for i in range(len(radii))]
-        # apertureAreas =  [ EllipticalAperture((xc,yc), r, r*e, theta=to).area for r in radii]
 
         if weighted_map is not None:
-            weighted_phot_table = aperture_photometry(img/weighted_map, apertures, mask=np.isnan(img) ) #hstack([ aperture_photometry(img/weighted_map, EllipticalAperture((xc,yc), r, r*np.sqrt(1-e**2), theta=to), mask=np.isnan(img) ) for r in radii ])
+            weighted_phot_table = aperture_photometry(img/weighted_map, apertures, mask=np.isnan(img) ) 
             weightedFluxes  =  [ weighted_phot_table[apertureName].data[0] for apertureName in apertureNames ]
 
             # maxidx = np.argmax(weightedFluxes[:]) #tmpidx
@@ -657,7 +653,7 @@ def coadd_profile(prop, phot_vars, zphot, weighted_map=None):
 
     def _re_cutoff(array, qre):
         ell = ((xi-xc)*np.cos(to)+(yi-yc)*np.sin(to))**2./(qre)**2 \
-                + ((xi-xc)*np.sin(to)-(yi-yc)*np.cos(to))**2./(qre*np.sqrt(1-e**2))**2.
+                + ((xi-xc)*np.sin(to)-(yi-yc)*np.cos(to))**2./(qre*e)**2.
         tmpidx = np.where(ell<1)[0]
         return tmpidx
 
@@ -725,7 +721,7 @@ def coadd_profile(prop, phot_vars, zphot, weighted_map=None):
 
         sfrnorm = norm_sfrd(lsfr, re)
         ssfr = 10**(lsfr[~np.isnan(lsfr)].ravel()-m[~np.isnan(m)].ravel())
-        ell_h, ell_f  = ellipses(re, np.sqrt(1-e**2)*re, to)
+        ell_h, ell_f  = ellipses(re, e*re, to)
         tmp = mapNorm([yi, xi, rnorm, dnorm, uvrest[~np.isnan(m)].ravel(), physvar[~np.isnan(physvar)].ravel(), sfrnorm, agew[~np.isnan(agew)].ravel()], re2idx)
 
         gal_par.insert(len(gal_par), ell_h)
@@ -752,7 +748,7 @@ def coadd_profile(prop, phot_vars, zphot, weighted_map=None):
 
         sfrnorm = norm_sfrd(lsfr, re)
         ssfr = 10**(lsfr[~np.isnan(lsfr)].ravel()-m[~np.isnan(m)].ravel())
-        ell_h, ell_f  = ellipses(re, np.sqrt(1-e**2)*re, to)
+        ell_h, ell_f  = ellipses(re, e*re, to)
         tmp = mapNorm([yi, xi, rnorm, dnorm, uvrest[~np.isnan(m)].ravel(), photvar[~np.isnan(photvar)].ravel(), sfrnorm, agew[~np.isnan(agew)].ravel()], re2idx)
 
         gal_par.insert(len(gal_par), ell_h)
