@@ -287,7 +287,7 @@ def createCat(decpath, tile):
     if normalizedprofiles[0]:
         for fname, normprofile in zip(['m', 'u', 'v'], normalizedprofiles):
             output = open('./{}/a{}/{}norm.pkl'.format(decpath, tile, fname), 'wb')
-            pickle.dump(normprofiles[0], output)
+            pickle.dump(normprofile[0], output)
             output.close()
 
     ids_clumps = np.array(ids_clumps)
