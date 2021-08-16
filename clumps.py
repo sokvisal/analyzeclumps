@@ -16,6 +16,9 @@ from operator import itemgetter
 from astropy.io import fits
 import pandas as pd
 
+import collections
+import pickle
+
 import structparams
 import normprofiles
 import old_normporfiles
@@ -204,11 +207,11 @@ def stellarPopMaps(directory, path):
         tmpy, tmpx = np.unravel_index(np.argmax(tmpvars[0]), tmpvars[0].shape)
         return [physvars, photvars, binmaps, binshape], [tmpy, tmpx]
 
-def retrieved_maps(directories, path):
+def retrieved_maps(directories, path, return_normprofiles=False):
 
-    master_umap = []
-    master_vmap = []
-    master_mmap = []
+    master_umap = collections.defaultdict(list)
+    master_vmap = collections.defaultdict(list)
+    master_mmap = collections.defaultdict(list)
 
     test_lst = []
     physicals = []
@@ -266,12 +269,12 @@ def retrieved_maps(directories, path):
 
                 newcat_clumps.append([idnum, zp,  galmass_idl, mass, galsfr] + clumpids + ccs + uv_lights + diagnostics)
 
-#                 if abs(galmass_idl-mass)>0.3:
-#                 misc.tmpsedfits(d, binshape)
-
-                master_mmap.append(normmaps[0][2:])
-                master_umap.append(normmaps[1][2:])
-                master_vmap.append(normmaps[2][2:])
+                if return_normprofiles:
+                    master_mmap = {key: master_mmap[key] + normmaps[0][key] for key in normmaps[0]}
+                    master_umap = {key: master_umap[key] + normmaps[1][key] for key in normmaps[1]}
+                    master_vmap = {key: master_vmap[key] + normmaps[2][key] for key in normmaps[2]}
+                else:
+                    pass
 
     return [master_umap, master_vmap, master_mmap], physicals, selzp, test_lst, newcat_clumps
 
@@ -279,10 +282,15 @@ def retrieved_maps(directories, path):
 
 def createCat(decpath, tile):
     dirname = './{}/a{}/_id*'.format(decpath, tile)
-    normalizedprofile, physicals, selzp, test_lst, ids_clumps = retrieved_maps(dirname, decpath)
+
+    normalizedprofiles, physicals, selzp, test_lst, ids_clumps = retrieved_maps(dirname, decpath, return_normprofiles=True)
+    if normalizedprofiles[0]:
+        for fname, normprofile in zip(['m', 'u', 'v'], normalizedprofiles):
+            output = open('./{}/a{}/{}norm.pkl'.format(decpath, tile, fname), 'wb')
+            pickle.dump(normprofiles[0], output)
+            output.close()
 
     ids_clumps = np.array(ids_clumps)
-
     from astropy.table import Table
     # ids_clumps_cat = Table([ids_clumps[:,i] for i in range(18)],\
     #                        names=('id', 'z', 'lm', 'lm_res', 'lsfr', 'mclump', 'fuclump', 'uclump', 'vclump',\
