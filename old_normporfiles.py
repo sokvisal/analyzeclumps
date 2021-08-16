@@ -25,47 +25,33 @@ plt.rcParams.update({'font.size':15,\
                     'xtick.major.width':1.2, 'xtick.minor.width':1.0, 'xtick.major.size':5., 'xtick.minor.size':3.0,\
                     'ytick.major.width':1.2, 'ytick.minor.width':1.0, 'ytick.major.size':5., 'ytick.minor.size':3.0})
 
+class Clump:
+    def __init__(self, normap, shape):
+        self.shape = shape
 
-def caddnorm_plot(rgb_img, maps, normmaps, params, titleparams, res, plot=False, show=False, save=None): # yi, xi, norm_r, norm_quan, uvmap
-    sm, sfr, lu, lv, uvrest, binmaps = maps
-    binmap = binmaps[0]
-    weighted_map = binmaps[1]
+        self.yi = normap['yi']
+        self.xi = normap['xi']
+        self.rnorm = normap['rnorm']
+        self.qnorm = normap['qnorm']
+        self.umv = normap['umv']
+        self.photvar = np.array( normap['quantity'] )
 
-    massNorm = normmaps[0]
-    Norm2800 = normmaps[1]
-    uNorm = normmaps[2]
-    vNorm = normmaps[3]
-    xc, yc, to, a, b, ell_mh, ell_mf, ell_2800h, ell_2800f, ell_uh, ell_uf, ell_vh, ell_vf = params
+        self._create_map()
+        self._cal_clumpyFrac()
 
-    c = rgb_img.shape[0]/2
-    citv = int(c*2/3)
-
-    segrgb = rgb_img#[c-citv:c+citv,c-citv:c+citv]
-
-    vmin=np.nanmin(uvrest)
-    vmax=np.nanmax(uvrest)
-
-    tmpx = np.arange(-0.5, 2.0, 0.1)
-    tmpy = 0.06-1.6*tmpx-tmpx**2
-
-    def map_clumps(normap, re, size):
-        yi = normap[0]
-        xi = normap[1]
-        rnorm = normap[2]
-        qnorm = normap[3]
-
-        clump_map = np.zeros((size,size))
+    def _create_map(self):
+        clump_map = np.zeros(self.shape)
 
         inner_yx= []
         clump_yx= []
         outer_yx= []
-        for i, (yval,xval) in enumerate(zip(qnorm, rnorm)):
+        for i, (yval,xval) in enumerate(zip(self.qnorm, self.rnorm)):
             if xval < -0.5:#np.log10(0.3/(re*0.05)):#-0.5:
-                inner_yx.append([yi[i], xi[i]])
+                inner_yx.append([self.yi[i], self.xi[i]])
             elif yval > 0.06-1.6*xval-xval**2:
-                clump_yx.append([yi[i], xi[i]])
+                clump_yx.append([self.yi[i], self.xi[i]])
             elif yval < 0.06-1.6*xval-xval**2:
-                outer_yx.append([yi[i], xi[i]])
+                outer_yx.append([self.yi[i], self.xi[i]])
         clump_yx = np.array(clump_yx)
         outer_yx = np.array(outer_yx)
         inner_yx = np.array(inner_yx)
@@ -76,58 +62,63 @@ def caddnorm_plot(rgb_img, maps, normmaps, params, titleparams, res, plot=False,
             # clump_map[outer_yx[:,0], outer_yx[:,1]] = 2
             # clump_map[inner_yx[:,0], inner_yx[:,1]] = 1
 
-        return clump_map
+        clump_map[clump_map==0] = np.nan
+
+        self.raveled_clump_map = clump_map[~np.isnan(clump_map)].ravel()
+        self.clump_map = clump_map
+
+    def _cal_clumpyFrac(self):
+        self.clumpFrac = np.sum(self.photvar[self.raveled_clump_map==3]) / np.sum(self.photvar)
+
+    def get_map(self):
+        return self.clump_map
+
+    def get_ravel_map(self):
+        return self.raveled_clump_map
+
+    def get_rnorm(self):
+        return self.rnorm
+
+    def get_qnorm(self):
+        return self.qnorm
+
+    def get_uvm(self):
+        return self.umv
+
+    def get_clumpFrac(self):
+        return self.clumpFrac
+
+    def get_measured_photvar(self):
+        return np.sum(self.photvar[self.raveled_clump_map==3]), np.sum(self.photvar)
 
 
-    clumpmap_2800 = map_clumps(Norm2800, res[1], size=lu.shape[0])
-    clumpmap_2800[clumpmap_2800==0] = np.nan
-    clumpmap_u = map_clumps(uNorm, res[2], size=lu.shape[0])
-    clumpmap_u[clumpmap_u==0] = np.nan
-    clumpmap_v = map_clumps(vNorm, res[3], size=lu.shape[0])
-    clumpmap_v[clumpmap_v==0] = np.nan
-    clumpmap_m = map_clumps(massNorm, res[0], size=lu.shape[0])
-    clumpmap_m[clumpmap_m==0] = np.nan
+def caddnorm_plot(rgb_img, maps, normmaps, params, titleparams, plot=False, show=False, save=None): # yi, xi, norm_r, norm_quan, uvmap
+    sm, sfr, lu, lv, uvrest, binmaps = maps
+    # binmap = binmaps[0]
+    # weighted_map = binmaps[1]
 
-    clumpmap_2800_r = clumpmap_2800[~np.isnan(clumpmap_2800)].ravel()
-    clumpmap_u_r = clumpmap_u[~np.isnan(clumpmap_u)].ravel()
-    clumpmap_v_r = clumpmap_v[~np.isnan(clumpmap_v)].ravel()
-    clumpmap_m_r = clumpmap_m[~np.isnan(clumpmap_m)].ravel()
+    massNorm = normmaps[0]
+    Norm2800 = normmaps[1]
+    uNorm = normmaps[2]
+    vNorm = normmaps[3]
 
-    mravel = np.array(massNorm[5])
-    ravel2800 = np.array(Norm2800[5])
-    uravel = np.array(uNorm[5])#u[~np.isnan(u)].ravel()[uNorm[5]]
-    vravel = np.array(vNorm[5])#v[~np.isnan(v)].ravel()[vNorm[5]]
-    #
-    # from scipy.stats import binned_statistic_2d
-    # binx = np.arange(-3,1.1,.1)
-    # tmpstat = binned_statistic_2d(runorm, unorm, uuv, 'median', bins=[binx,binx])
-    #
-    # plt.imshow(tmpstat.statistic.T, origin='lower', cmap='jet')
-    # plt.show()
+    cFUV = Clump(Norm2800, lu.shape)
+    cUV = Clump(uNorm, lu.shape)
+    cV = Clump(vNorm, lu.shape)
+    cMass = Clump(massNorm, lu.shape)
 
+    clumpiness = cUV.get_clumpFrac()
+    uv_clump, uv_gal = cUV.get_measured_photvar()
 
-    # define extended clumps
-    mclump = np.sum(mravel[clumpmap_m_r==3])/np.sum(mravel)
-    clump2800 = np.sum(ravel2800[clumpmap_2800_r==3])/np.sum(ravel2800)
-    uclump = np.sum(uravel[clumpmap_u_r==3])/np.sum(uravel)
-    vclump = np.sum(vravel[clumpmap_v_r==3])/np.sum(vravel)
+    cc_sm = clumps_contribution(uNorm['yi'], uNorm['xi'], sm, cUV.get_ravel_map() )
+    cc_sfr = clumps_contribution(uNorm['yi'], uNorm['xi'], sfr, cUV.get_ravel_map() )
 
     clumpyid = [0,0,0,0]
-    for i, fraction in enumerate([mclump, clump2800, uclump, vclump]):
+    for i, fraction in enumerate([cMass.get_clumpFrac(), cFUV.get_clumpFrac(), cUV.get_clumpFrac(), cV.get_clumpFrac()]):
         if 0.05<fraction<0.08:
             clumpyid[i] = 1
         elif fraction>=0.08:
             clumpyid[i] = 2
-
-    cc_sm = clumps_contribution(uNorm[0], uNorm[1], sm, clumpmap_u_r)
-    cc_sfr = clumps_contribution(uNorm[0], uNorm[1], sfr, clumpmap_u_r)
-
-    clumpiness = np.sum(uravel[clumpmap_u_r==3])/np.sum(uravel)
-    uv_clump = np.sum(uravel[clumpmap_u_r==3])
-    uv_gal = np.sum(uravel)
-    # print 'Clumps Fractional Contribution is L_v: ', np.sum(vravel[clumpmap_v_r==3])/np.sum(vravel)
-    # print np.sum(uravel[clumpmap_u_r==3])/np.sum(uravel)
-    # print np.sum(vravel[clumpmap_v_r==3])/np.sum(vravel)
 
     if plot:
 
@@ -136,6 +127,18 @@ def caddnorm_plot(rgb_img, maps, normmaps, params, titleparams, res, plot=False,
         dc = c-citv
 
         segrgb = rgb_img[c-citv:c+citv,c-citv:c+citv]
+
+        vmin=np.nanmin(uvrest)
+        vmax=np.nanmax(uvrest)
+
+        tmpx = np.arange(-0.5, 2.0, 0.1)
+        tmpy = 0.06-1.6*tmpx-tmpx**2
+
+        clumpmap_fuv = cFUV.get_map()
+        clumpmap_uv = cUV.get_map()
+        clumpmap_v = cV.get_map()
+        clumpmap_m = cMass.get_map()
+        xc, yc, to, a, b, ell_mh, ell_mf, ell_2800h, ell_2800f, ell_uh, ell_uf, ell_vh, ell_vf = params
 
         nrow = 4
         ncol = 4
@@ -190,8 +193,8 @@ def caddnorm_plot(rgb_img, maps, normmaps, params, titleparams, res, plot=False,
 
         ################## Stellar Mass Clumps ########################
         ax = plt.subplot(gs[1,1], aspect='auto')
-        order = np.argsort(massNorm[4])[::-1]
-        ax.scatter(np.array(massNorm[2])[order], np.array(massNorm[3])[order], c=np.array(massNorm[4])[order], s=10, cmap='Spectral_r', vmin=vmin, vmax=vmax)
+        order = np.argsort(cMass.get_uvm())[::-1]
+        ax.scatter(np.array(cMass.get_rnorm())[order], np.array(cMass.get_qnorm())[order], c=np.array(cMass.get_uvm())[order], s=10, cmap='Spectral_r', vmin=vmin, vmax=vmax)
         # ax.scatter(massNorm[2], massNorm[3], c=clumpmap_m_r, s=10, cmap=cmap, vmax=4)
         ax.text(-1.5,-0.6,'Inner')
         ax.text(-0.4,-1.8, 'Outer')
@@ -218,7 +221,7 @@ def caddnorm_plot(rgb_img, maps, normmaps, params, titleparams, res, plot=False,
         # ax.text(5,5,'Mass Clump Map (%i)' %(int(extend_clumpyid[0])))
         ax.text(5,108,'(ix)', weight='bold')
         ax.text(5,5,'Mass Clump Map')
-        if mclump>0.08: ax.text(5,15,'Mass Clumpy')
+        if cMass.get_clumpFrac()>0.08: ax.text(5,15,'Mass Clumpy')
         ax.set_xticks([])
         ax.set_yticks([])
         ax.plot(xc-dc+ell_mh[0,:], yc-dc+ell_mh[1,:], linestyle='--',  color="k", linewidth=1, label='R$_\mathrm{e}$')
@@ -240,9 +243,9 @@ def caddnorm_plot(rgb_img, maps, normmaps, params, titleparams, res, plot=False,
 
         ################### Urest Clump ########################
         ax = plt.subplot(gs[2,1], aspect='auto') # aspect='equal'
-        order = np.argsort(uNorm[4])#[::-1]
-        ax.scatter(np.array(uNorm[2])[order], np.array(uNorm[3])[order], c=np.array(uNorm[4])[order], s=10, cmap='Spectral_r', vmin=vmin, vmax=vmax)
-        # ax.scatter(uNorm[2], uNorm[3], c=clumpmap_u_r, s=10, cmap=cmap, vmax=4)
+        order = np.argsort(cUV.get_uvm())#[::-1]
+        ax.scatter(np.array(cUV.get_rnorm())[order], np.array(cUV.get_qnorm())[order], c=np.array(cUV.get_uvm())[order], s=10, cmap='Spectral_r', vmin=vmin, vmax=vmax)
+        # ax.scatter(uNorm[2], uNorm[3], c=cUV.get_ravel_map(), s=10, cmap=cmap, vmax=4)
         ax.text(-1.5,-0.6,'Inner')
         ax.text(-0.4,-1.8, 'Outer')
         ax.text(-0.4,0.7, 'Clump')
@@ -272,11 +275,11 @@ def caddnorm_plot(rgb_img, maps, normmaps, params, titleparams, res, plot=False,
 
         ################### Clump map ########################
         ax = plt.subplot(gs[2,3], aspect='auto')
-        ax.imshow(clumpmap_u[c-citv:c+citv,c-citv:c+citv], origin='lower', cmap=cmap, vmax=4)
+        ax.imshow(clumpmap_uv[c-citv:c+citv,c-citv:c+citv], origin='lower', cmap=cmap, vmax=4)
         # ax.text(5,5,'U$_\mathrm{rest}$ Clump Map (%i)' %(int(extend_clumpyid[2])))
         ax.text(5,108,'(x)', weight='bold')
         ax.text(5,5,'$U_\mathrm{rest}$ Clump Map')
-        if uclump>0.08: ax.text(5,20,'Clumpy in $U_\mathrm{rest}$')
+        if cUV.get_clumpFrac()>0.08: ax.text(5,20,'Clumpy in $U_\mathrm{rest}$')
         # if uclump>0.08: ax.text(5,15,'U$_\mathrm{rest}$ Clumpy')
         ax.set_xticks([])
         ax.set_yticks([])
@@ -299,8 +302,8 @@ def caddnorm_plot(rgb_img, maps, normmaps, params, titleparams, res, plot=False,
 
         ################### Urest Clump ########################
         ax = plt.subplot(gs[3,1], aspect='auto') # aspect='equal'
-        # ax.scatter(vNorm[2], vNorm[3], c=vNorm[4], s=10, cmap='Spectral_r', vmin=vmin, vmax=vmax)
-        ax.scatter(vNorm[2], vNorm[3], c=clumpmap_v_r, s=10, cmap=cmap, vmax=4)
+        ax.scatter(np.array(cV.get_rnorm()), np.array(cV.get_qnorm()), c=np.array(cV.get_uvm()), s=10, cmap='Spectral_r', vmin=vmin, vmax=vmax)
+        # ax.scatter(vNorm[2], vNorm[3], c=cV.get_ravel_map(), s=10, cmap=cmap, vmax=4)
         ax.text(-1.5,-0.6,'Inner')
         ax.text(-0.4,-1.8, 'Outer')
         ax.text(-0.4,0.7, 'Clump')
@@ -323,7 +326,7 @@ def caddnorm_plot(rgb_img, maps, normmaps, params, titleparams, res, plot=False,
         # ax.text(5,5,'V$_\mathrm{rest}$ Clump Map (%i)' %(int(extend_clumpyid[3])))
         ax.text(5,108,'(xi)', weight='bold')
         ax.text(5,5,'$V_\mathrm{rest}$ Clump Map')
-        if vclump>0.08: ax.text(5,20,'Clumpy in $V_\mathrm{rest}$')
+        if cV.get_clumpFrac()>0.08: ax.text(5,20,'Clumpy in $V_\mathrm{rest}$')
         ax.set_xticks([])
         ax.set_yticks([])
         ax.plot(xc-dc+ell_vh[0,:], yc-dc+ell_vh[1,:], linestyle='--',  color="k", linewidth=1, label='R$_\mathrm{e}$')
@@ -609,11 +612,12 @@ def coadd_profile(prop, phot_vars, zphot, weighted_map=None):
         apertures = [ EllipticalAperture((xc,yc), r, r*e, theta=to) for r in radii ]
         phot_table = aperture_photometry(img, apertures, mask=np.isnan(img) )
         apertureNames = phot_table.colnames[3:]
+        # print (np.lib.recfunctions.structured_to_unstructured( phot_table[apertureNames].as_array()[0] ))
         apertureFluxes  = [ phot_table[apertureName].data[0] for apertureName in apertureNames ]
         apertureAreas =  [ aperture.area for aperture in apertures ]
 
         if weighted_map is not None:
-            weighted_phot_table = aperture_photometry(img/weighted_map, apertures, mask=np.isnan(img) ) 
+            weighted_phot_table = aperture_photometry(img/weighted_map, apertures, mask=np.isnan(img) )
             weightedFluxes  =  [ weighted_phot_table[apertureName].data[0] for apertureName in apertureNames ]
 
             # maxidx = np.argmax(weightedFluxes[:]) #tmpidx
@@ -665,10 +669,13 @@ def coadd_profile(prop, phot_vars, zphot, weighted_map=None):
 
     def mapNorm(ndarray, masked_coord):
         ''' ndarray: yi, xi, norm_r, norm_quan, uvmap '''
+        keys = ['yi', 'xi', 'rnorm', 'qnorm', 'umv', 'quantity']
+
+        assert len(ndarray) == len(keys), "length of input ndarray must be length of keys"
         if masked_coord is None:
-            return [list(d) for d in ndarray]
+            return {key: list(d) for (key, d) in zip(keys, ndarray)}
         else:
-            return [list(d[masked_coord]) for d in ndarray]
+            return {key: list(d[masked_coord]) for (key, d) in zip(keys, ndarray)}
 
     def norm_sfrd(lsfr, re):
         smask = 10**(lsfr[~np.isnan(lsfr)].ravel())
@@ -709,11 +716,9 @@ def coadd_profile(prop, phot_vars, zphot, weighted_map=None):
 
     gal_par = [xc, yc, to, a, b]
     norm_par = []
-    res = []
     for i, physvar in enumerate(prop[:1]):
         dmask = 10**(physvar[~np.isnan(physvar)].ravel())
         norm, re = halflightR(dmask, 10**physvar, mass=True, weighted_map=weighted_map)
-        res.append(re)
 
         dnorm = np.log10(dmask/norm)
         rnorm = np.log10(r/re)
@@ -722,7 +727,7 @@ def coadd_profile(prop, phot_vars, zphot, weighted_map=None):
         sfrnorm = norm_sfrd(lsfr, re)
         ssfr = 10**(lsfr[~np.isnan(lsfr)].ravel()-m[~np.isnan(m)].ravel())
         ell_h, ell_f  = ellipses(re, e*re, to)
-        tmp = mapNorm([yi, xi, rnorm, dnorm, uvrest[~np.isnan(m)].ravel(), physvar[~np.isnan(physvar)].ravel(), sfrnorm, agew[~np.isnan(agew)].ravel()], re2idx)
+        tmp = mapNorm([yi, xi, rnorm, dnorm, uvrest[~np.isnan(m)].ravel(), physvar[~np.isnan(physvar)].ravel()], re2idx ) #, sfrnorm, agew[~np.isnan(agew)].ravel()], re2idx)
 
         gal_par.insert(len(gal_par), ell_h)
         gal_par.insert(len(gal_par), ell_f)
@@ -734,7 +739,6 @@ def coadd_profile(prop, phot_vars, zphot, weighted_map=None):
         dmask = photvar[~np.isnan(photvar)].ravel()
 
         norm, re = halflightR(dmask, photvar, mass=False, weighted_map=weighted_map)
-        res.append(re)
 
         dnorm = np.log10(dmask/norm)
         rnorm = np.log10(r/re)
@@ -749,10 +753,10 @@ def coadd_profile(prop, phot_vars, zphot, weighted_map=None):
         sfrnorm = norm_sfrd(lsfr, re)
         ssfr = 10**(lsfr[~np.isnan(lsfr)].ravel()-m[~np.isnan(m)].ravel())
         ell_h, ell_f  = ellipses(re, e*re, to)
-        tmp = mapNorm([yi, xi, rnorm, dnorm, uvrest[~np.isnan(m)].ravel(), photvar[~np.isnan(photvar)].ravel(), sfrnorm, agew[~np.isnan(agew)].ravel()], re2idx)
+        tmp = mapNorm([yi, xi, rnorm, dnorm, uvrest[~np.isnan(m)].ravel(), photvar[~np.isnan(photvar)].ravel()], re2idx ) #, sfrnorm, agew[~np.isnan(agew)].ravel()], re2idx)
 
         gal_par.insert(len(gal_par), ell_h)
         gal_par.insert(len(gal_par), ell_f)
         norm_par.append(tmp)
 
-    return masstot, gal_par, norm_par, [mcd_re, ssfr_i, ssfr_o], res
+    return masstot, gal_par, norm_par, [mcd_re, ssfr_i, ssfr_o]
