@@ -36,10 +36,12 @@ class Clump:
         self.umv = normap['umv']
         self.photvar = np.array( normap['quantity'] )
 
-        self._create_map()
+        self.clump_map, self.raveled_clump_map = self._create_map()
+        self._create_map(y_int=-0.04)
+        self._create_map(y_int=0.16)
         self._cal_clumpyFrac()
 
-    def _create_map(self):
+    def _create_map(self, y_int = 0.06):
         clump_map = np.zeros(self.shape)
 
         inner_yx= []
@@ -48,9 +50,9 @@ class Clump:
         for i, (yval,xval) in enumerate(zip(self.qnorm, self.rnorm)):
             if xval < -0.5:#np.log10(0.3/(re*0.05)):#-0.5:
                 inner_yx.append([self.yi[i], self.xi[i]])
-            elif yval > 0.06-1.6*xval-xval**2:
+            elif yval > y_int - 1.6*xval-xval**2:
                 clump_yx.append([self.yi[i], self.xi[i]])
-            elif yval < 0.06-1.6*xval-xval**2:
+            elif yval < y_int - 1.6*xval-xval**2:
                 outer_yx.append([self.yi[i], self.xi[i]])
         clump_yx = np.array(clump_yx)
         outer_yx = np.array(outer_yx)
@@ -61,11 +63,14 @@ class Clump:
                 clump_map[data[:,0], data[:,1]] = i+1
             # clump_map[outer_yx[:,0], outer_yx[:,1]] = 2
             # clump_map[inner_yx[:,0], inner_yx[:,1]] = 1
-
         clump_map[clump_map==0] = np.nan
 
-        self.raveled_clump_map = clump_map[~np.isnan(clump_map)].ravel()
-        self.clump_map = clump_map
+        if y_int == 0.06:
+            return clump_map, clump_map[~np.isnan(clump_map)].ravel()
+        elif y_int < 0.06:
+            self.upplim_raveled_map = clump_map[~np.isnan(clump_map)].ravel()
+        else:
+            self.lowlim_raveled_map = clump_map[~np.isnan(clump_map)].ravel()
 
     def _cal_clumpyFrac(self):
         self.clumpFrac = np.sum(self.photvar[self.raveled_clump_map==3]) / np.sum(self.photvar)
@@ -89,7 +94,11 @@ class Clump:
         return self.clumpFrac
 
     def get_measured_photvar(self):
-        return np.sum(self.photvar[self.raveled_clump_map==3]), np.sum(self.photvar)
+        sumClump = np.sum(self.photvar[self.raveled_clump_map==3])
+        sum_lowlim = np.sum(self.photvar[self.lowlim_raveled_map==3])
+        sum_upplim = np.sum(self.photvar[self.upplim_raveled_map==3])
+        sumTot = np.sum(self.photvar)
+        return sumClump, sum_lowlim, sum_upplim, sumTot
 
 
 def caddnorm_plot(rgb_img, maps, normmaps, params, titleparams, plot=False, show=False, save=None): # yi, xi, norm_r, norm_quan, uvmap
@@ -108,7 +117,7 @@ def caddnorm_plot(rgb_img, maps, normmaps, params, titleparams, plot=False, show
     cMass = Clump(massNorm, lu.shape)
 
     clumpiness = cUV.get_clumpFrac()
-    uv_clump, uv_gal = cUV.get_measured_photvar()
+    uv_clump, uv_clump_low, uv_clump_upp, uv_gal = cUV.get_measured_photvar()
 
     cc_sm = clumps_contribution(uNorm['yi'], uNorm['xi'], sm, cUV.get_ravel_map() )
     cc_sfr = clumps_contribution(uNorm['yi'], uNorm['xi'], sfr, cUV.get_ravel_map() )
@@ -356,7 +365,7 @@ def caddnorm_plot(rgb_img, maps, normmaps, params, titleparams, plot=False, show
         #     save.savefig(fig, dpi=300, bbox_inches = 'tight')
         #     plt.close()
 
-    return clumpyid, [uv_clump, uv_gal], [cc_sm, cc_sfr]
+    return clumpyid, [uv_clump, uv_clump_low, uv_clump_upp, uv_gal], [cc_sm, cc_sfr]
 
 def clumps_contribution(yarray, xarray, map, clumps_map):
     # coords = zip(yarray, xarray)
